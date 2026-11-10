@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ผู้ดูแลระบบ | CARS27</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap">
+    <style>
+        body { font-family: Kanit, sans-serif; background: #f5f2f0; color: #1a1d20; }
+        .btn-primary { background: #b9122d; color: #fff; }
+        .btn-primary:disabled { opacity: .6; cursor: wait; }
+        .form-input { width: 100%; margin-top: .25rem; padding: .55rem .75rem; border: 1px solid #d5d2d0; border-radius: .375rem; background: white; }
+        .form-input:focus { outline: 2px solid #b9122d; outline-offset: 1px; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <header class="bg-white border-b border-black/10">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="/" class="font-bold text-xl">CARS27 <span class="text-sm font-normal text-slate-500">ADMIN</span></a>
+            <a href="/" class="text-sm text-slate-600 hover:text-red-700">กลับหน้ารายการรถ</a>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-10">
+        <section class="bg-white rounded-xl shadow-sm border border-black/10 p-5 sm:p-8">
+            <h1 class="text-2xl font-semibold">จัดการรายการรถ</h1>
+            <p class="text-sm text-slate-500 mt-1">พื้นที่สำหรับผู้ดูแลระบบเท่านั้น</p>
+
+            <form id="adminLogin" class="mt-6 space-y-3">
+                <label for="adminKey" class="block text-sm font-medium">กุญแจผู้ดูแลระบบ</label>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input id="adminKey" type="password" required autocomplete="current-password" class="form-input mt-0" placeholder="กรอก CAR_ADMIN_API_KEY">
+                    <button id="loginButton" class="btn-primary rounded-md px-5 py-2 whitespace-nowrap">เข้าสู่ระบบ</button>
+                </div>
+                <p id="loginMessage" class="text-sm text-red-700" role="alert"></p>
+            </form>
+
+            <div id="adminWorkspace" class="hidden mt-8">
+                <div class="flex items-center justify-between gap-4 border-b border-black/10 pb-4 mb-5">
+                    <h2 class="text-lg font-medium">จัดการรถในระบบ</h2>
+                    <button id="logoutButton" type="button" class="text-sm text-red-700 hover:underline">ออกจากระบบ</button>
+                </div>
+
+                <section class="mb-9">
+                    <div class="flex items-center justify-between gap-3 mb-3">
+                        <h3 class="font-medium">รายการรถทั้งหมด</h3>
+                        <button id="refreshCarsButton" type="button" class="text-sm text-red-700 hover:underline">รีเฟรชรายการ</button>
+                    </div>
+                    <p id="inventoryMessage" class="text-sm text-slate-500 mb-3" role="status"></p>
+                    <div id="adminCarsList" class="space-y-3"></div>
+                </section>
+
+                <div id="carFormSection" class="border-t border-black/10 pt-6">
+                    <h3 id="carFormTitle" class="text-lg font-medium mb-4">เพิ่มรถเข้ารายการ</h3>
+                <form id="addCarForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <label class="block text-sm font-medium">ยี่ห้อ *
+                        <input name="brand" required maxlength="50" class="form-input" placeholder="Toyota">
+                    </label>
+                    <label class="block text-sm font-medium">รุ่น *
+                        <input name="model" required maxlength="100" class="form-input" placeholder="Camry">
+                    </label>
+                    <label class="block text-sm font-medium">รุ่นย่อย
+                        <input name="trim" maxlength="100" class="form-input" placeholder="2.5 Premium">
+                    </label>
+                    <label class="block text-sm font-medium">ปีรถ *
+                        <input name="manufacture_year" type="number" min="1886" max="2100" step="1" required class="form-input">
+                    </label>
+                    <label class="block text-sm font-medium">ราคา (บาท) *
+                        <input name="price" type="number" min="0.01" max="99999999.99" step="0.01" required class="form-input">
+                    </label>
+                    <label class="block text-sm font-medium">เลขไมล์ (กม.) *
+                        <input name="mileage" type="number" min="0" step="1" required class="form-input">
+                    </label>
+                    <label class="block text-sm font-medium">ประเภทรถ
+                        <select name="body_type" class="form-input">
+                            <option>Sedan</option><option>SUV</option><option>Hatchback</option><option>MPV</option><option>Pickup</option><option>Van</option><option>Coupe</option>
+                        </select>
+                    </label>
+                    <label class="block text-sm font-medium">ระบบเกียร์
+                        <input name="transmission" maxlength="40" value="Automatic" class="form-input">
+                    </label>
+                    <label class="block text-sm font-medium">เชื้อเพลิง
+                        <input name="fuel" maxlength="40" value="Petrol" class="form-input">
+                    </label>
+                    <label class="block text-sm font-medium">เครื่องยนต์
+                        <input name="engine" maxlength="50" class="form-input" placeholder="2.0L">
+                    </label>
+                    <label class="block text-sm font-medium">สีรถ
+                        <input name="color" maxlength="30" class="form-input">
+                    </label>
+                    <label class="block text-sm font-medium">ทะเบียนรถ
+                        <input name="license_plate" maxlength="20" class="form-input">
+                    </label>
+                    <label class="block text-sm font-medium">ราคาก่อนลด (ถ้ามี)
+                        <input name="was_price" type="number" min="0.01" max="99999999.99" step="0.01" class="form-input">
+                    </label>
+                    <label class="block text-sm font-medium">รับประกัน (ปี)
+                        <input name="warranty_years" type="number" min="0" max="20" step="1" value="5" class="form-input">
+                    </label>
+                    <label class="block text-sm font-medium sm:col-span-2">รูปภาพจากเครื่อง (JPG, PNG, WebP สูงสุด 10 รูป รูปละไม่เกิน 5 MB)
+                        <input id="carImages" name="images" type="file" accept="image/jpeg,image/png,image/webp" multiple class="form-input">
+                    </label>
+                    <p id="selectedImages" class="sm:col-span-2 text-sm text-slate-500" aria-live="polite">ยังไม่ได้เลือกรูปภาพ</p>
+                    <div id="existingImageOrder" class="sm:col-span-2 space-y-2"></div>
+                    <label class="block text-sm font-medium sm:col-span-2">รายละเอียด
+                        <textarea name="description" rows="3" maxlength="10000" class="form-input"></textarea>
+                    </label>
+                    <div class="sm:col-span-2 flex flex-wrap gap-5 text-sm">
+                        <label class="flex items-center gap-2"><input name="is_featured" type="checkbox" checked> แสดงในรายการรถแนะนำ</label>
+                        <label class="flex items-center gap-2"><input name="is_hot_deal" type="checkbox"> แสดงใน HOT DEALS</label>
+                    </div>
+
+                    <p id="addCarMessage" class="sm:col-span-2 text-sm" role="status"></p>
+                    <div class="sm:col-span-2 flex justify-end">
+                        <button id="cancelEditButton" type="button" class="hidden mr-3 rounded-md border border-black/15 px-5 py-2.5 hover:bg-slate-100">ยกเลิกแก้ไข</button>
+                        <button id="saveCarButton" class="btn-primary rounded-md px-6 py-2.5 font-medium">บันทึกรถ</button>
+                    </div>
+                </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const loginForm = document.getElementById('adminLogin');
+        const keyInput = document.getElementById('adminKey');
+        const loginButton = document.getElementById('loginButton');
+        const loginMessage = document.getElementById('loginMessage');
+        const workspace = document.getElementById('adminWorkspace');
+        const carForm = document.getElementById('addCarForm');
+        const saveButton = document.getElementById('saveCarButton');
+        const carMessage = document.getElementById('addCarMessage');
+        const imageInput = document.getElementById('carImages');
+        const selectedImages = document.getElementById('selectedImages');
+        const carsList = document.getElementById('adminCarsList');
+        const inventoryMessage = document.getElementById('inventoryMessage');
+        const formTitle = document.getElementById('carFormTitle');
+        const cancelEditButton = document.getElementById('cancelEditButton');
+        const existingImageOrder = document.getElementById('existingImageOrder');
+        let adminKey = '';
+        let adminCars = [];
+        let editingCarId = null;
+
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/[&<>"']/g, character => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[character]);
+        }
+
+        async function loadAdminCars() {
+            inventoryMessage.textContent = 'กำลังโหลดรายการรถ...';
+            const response = await fetch('/api/admin/cars', {
+                headers: { Authorization: 'Bearer ' + adminKey }
+            });
+            const result = await response.json();
+            if (response.status === 401) {
+                adminKey = '';
+                workspace.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+                throw new Error('สิทธิ์หมดอายุ กรุณาเข้าสู่ระบบอีกครั้ง');
+            }
+            if (!response.ok) throw new Error(result.error || 'โหลดรายการรถไม่สำเร็จ');
+            adminCars = result;
+            renderAdminCars();
+            inventoryMessage.textContent = `รถทั้งหมด ${adminCars.length} คัน`;
+        }
+
+        function renderAdminCars() {
+            if (!adminCars.length) {
+                carsList.innerHTML = '<p class="rounded-md border border-dashed border-black/15 p-5 text-center text-sm text-slate-500">ยังไม่มีข้อมูลรถ</p>';
+                return;
+            }
+
+            carsList.innerHTML = adminCars.map(car => `
+                <article class="flex flex-col sm:flex-row sm:items-center gap-4 rounded-lg border border-black/10 p-3">
+                    <img src="${escapeHTML(car.image || car.images?.[0] || '')}" alt="" class="h-24 w-full sm:w-36 rounded object-cover bg-slate-100">
+                    <div class="min-w-0 flex-1">
+                        <h4 class="font-medium">${escapeHTML(car.year)} ${escapeHTML(car.make)} ${escapeHTML(car.model)} ${escapeHTML(car.trim)}</h4>
+                        <p class="text-sm text-slate-500">฿${Number(car.price).toLocaleString('th-TH')} · ${Number(car.mileage).toLocaleString('th-TH')} กม. · รูป ${car.images?.length || 0} รูป</p>
+                        <p class="text-xs text-slate-500">สถานะ: ${escapeHTML(car.status)}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="editCar(${Number(car.id)})" class="rounded-md border border-black/15 px-3 py-2 text-sm hover:bg-slate-100">แก้ไข</button>
+                        <button type="button" onclick="deleteCar(${Number(car.id)})" class="rounded-md border border-red-200 px-3 py-2 text-sm text-red-700 hover:bg-red-50">ลบ</button>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function resetCarForm() {
+            editingCarId = null;
+            carForm.reset();
+            carForm.elements.warranty_years.value = 5;
+            carForm.elements.body_type.value = 'Sedan';
+            carForm.elements.transmission.value = 'Automatic';
+            carForm.elements.fuel.value = 'Petrol';
+            imageInput.setCustomValidity('');
+            selectedImages.textContent = 'ยังไม่ได้เลือกรูปภาพ';
+            selectedImages.classList.remove('text-red-700');
+            existingImageOrder.innerHTML = '';
+            formTitle.textContent = 'เพิ่มรถเข้ารายการ';
+            saveButton.textContent = 'บันทึกรถ';
+            cancelEditButton.classList.add('hidden');
+            carMessage.textContent = '';
+        }
+
+        function editCar(carId) {
+            const car = adminCars.find(item => Number(item.id) === carId);
+            if (!car) return;
+
+            editingCarId = carId;
+            imageInput.value = '';
+            imageInput.setCustomValidity('');
+            for (const [field, value] of Object.entries({
+                brand: car.make,
+                model: car.model,
+                trim: car.trim,
+                manufacture_year: car.year,
+                mileage: car.mileage,
+                price: car.price,
+                was_price: car.wasPrice,
+                body_type: car.bodyType,
+                transmission: car.transmission,
+                fuel: car.fuel,
+                engine: car.engine,
+                color: car.color,
+                warranty_years: car.warrantyYears,
+                description: car.description
+            })) {
+                carForm.elements[field].value = value ?? '';
+            }
+            carForm.elements.is_featured.checked = Boolean(Number(car.isFeatured));
+            carForm.elements.is_hot_deal.checked = Boolean(Number(car.isHotDeal));
+            selectedImages.textContent = `รูปปัจจุบัน ${car.images?.length || 0} รูป · เลือกรูปเพิ่มได้อีกไม่เกิน 10 รูป`;
+            renderImageOrder(car);
+            formTitle.textContent = `แก้ไขข้อมูลรถ #${carId}`;
+            saveButton.textContent = 'บันทึกการแก้ไข';
+            cancelEditButton.classList.remove('hidden');
+            carMessage.textContent = '';
+            document.getElementById('carFormSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function renderImageOrder(car) {
+            const images = car.imageRecords || [];
+            existingImageOrder.innerHTML = images.length
+                ? `<p class="text-sm font-medium">เรียงรูปที่มีอยู่ (รูปแรกจะแสดงเป็นรูปหลัก)</p>
+                    <div class="flex gap-3 overflow-x-auto pb-2">
+                        ${images.map((image, index) => `
+                            <div class="shrink-0 w-28 rounded border border-black/10 p-2 text-center">
+                                <img src="${escapeHTML(image.url)}" alt="รูปที่ ${index + 1}" class="h-16 w-full rounded object-cover">
+                                <p class="my-1 text-xs">${index === 0 ? 'ภาพหลัก' : `รูปที่ ${index + 1}`}</p>
+                                ${index > 0 ? `<button type="button" onclick="setCarPrimaryImage(${car.id}, ${index})" class="mb-1 rounded border border-red-200 px-2 py-1 text-[11px] text-red-700 hover:bg-red-50">ตั้งเป็นภาพแรก</button>` : ''}
+                                <div class="flex justify-center gap-1">
+                                    <button type="button" onclick="moveCarImage(${car.id}, ${index}, -1)" ${index === 0 ? 'disabled' : ''} aria-label="เลื่อนรูปที่ ${index + 1} ไปซ้าย" class="rounded border px-2 py-1 disabled:opacity-30">←</button>
+                                    <button type="button" onclick="moveCarImage(${car.id}, ${index}, 1)" ${index === images.length - 1 ? 'disabled' : ''} aria-label="เลื่อนรูปที่ ${index + 1} ไปขวา" class="rounded border px-2 py-1 disabled:opacity-30">→</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>`
+                : '';
+        }
+
+        async function moveCarImage(carId, index, direction) {
+            const car = adminCars.find(item => Number(item.id) === carId);
+            if (!car) return;
+            const images = [...(car.imageRecords || [])];
+            const target = index + direction;
+            if (target < 0 || target >= images.length) return;
+            [images[index], images[target]] = [images[target], images[index]];
+            await saveCarImageOrder(car, images);
+        }
+
+        async function setCarPrimaryImage(carId, index) {
+            const car = adminCars.find(item => Number(item.id) === carId);
+            if (!car) return;
+            const images = [...(car.imageRecords || [])];
+            if (index < 0 || index >= images.length) return;
+            images.unshift(...images.splice(index, 1));
+            await saveCarImageOrder(car, images);
+        }
+
+        async function saveCarImageOrder(car, images) {
+            existingImageOrder.querySelectorAll('button').forEach(button => button.disabled = true);
+            try {
+                const response = await fetch(`/api/cars/${car.id}/images/order`, {
+                    method: 'PUT',
+                    headers: {
+                        Authorization: 'Bearer ' + adminKey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ imageIds: images.map(image => image.id) })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'บันทึกลำดับรูปไม่สำเร็จ');
+                car.imageRecords = images;
+                car.images = images.map(image => image.url);
+                car.image = images[0]?.url || car.image;
+                renderImageOrder(car);
+                inventoryMessage.textContent = `บันทึกลำดับรูป ${car.make} ${car.model} แล้ว`;
+            } catch (error) {
+                inventoryMessage.textContent = error.message || 'บันทึกลำดับรูปไม่สำเร็จ';
+                inventoryMessage.classList.add('text-red-700');
+            }
+        }
+
+        async function deleteCar(carId) {
+            const car = adminCars.find(item => Number(item.id) === carId);
+            if (!car || !confirm(`ยืนยันลบ ${car.make} ${car.model} (${car.year})? รูปของรถคันนี้จะถูกลบด้วย`)) return;
+
+            inventoryMessage.textContent = 'กำลังลบรถ...';
+            try {
+                const response = await fetch(`/api/cars/${carId}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: 'Bearer ' + adminKey }
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'ลบรถไม่สำเร็จ');
+                if (editingCarId === carId) resetCarForm();
+                await loadAdminCars();
+                inventoryMessage.textContent = `ลบ ${car.make} ${car.model} เรียบร้อยแล้ว`;
+            } catch (error) {
+                inventoryMessage.textContent = error.message || 'ลบรถไม่สำเร็จ';
+                inventoryMessage.classList.add('text-red-700');
+            }
+        }
+
+        document.getElementById('refreshCarsButton').addEventListener('click', () => {
+            loadAdminCars().catch(error => {
+                inventoryMessage.textContent = error.message || 'โหลดรายการรถไม่สำเร็จ';
+            });
+        });
+        cancelEditButton.addEventListener('click', resetCarForm);
+
+        imageInput.addEventListener('change', () => {
+            const files = Array.from(imageInput.files);
+            const totalSize = files.reduce((total, file) => total + file.size, 0);
+            const invalidType = files.some(file => !['image/jpeg', 'image/png', 'image/webp'].includes(file.type));
+            const selectionError = files.length > 10
+                ? 'เลือกรูปได้ไม่เกิน 10 รูป'
+                : files.some(file => file.size > 5 * 1024 * 1024)
+                    ? 'ขนาดรูปแต่ละไฟล์ต้องไม่เกิน 5 MB'
+                    : invalidType
+                        ? 'รองรับเฉพาะไฟล์ JPG, PNG และ WebP'
+                        : '';
+            imageInput.setCustomValidity(selectionError);
+            selectedImages.textContent = files.length
+                ? `${selectionError || `เลือกรูป ${files.length} รูป (${(totalSize / (1024 * 1024)).toFixed(2)} MB)`}: ${files.map(file => file.name).join(', ')}`
+                : 'ยังไม่ได้เลือกรูปภาพ';
+            selectedImages.classList.toggle('text-red-700', Boolean(selectionError));
+        });
+
+        loginForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            loginButton.disabled = true;
+            loginMessage.textContent = '';
+            try {
+                const response = await fetch('/api/admin/session', {
+                    headers: { Authorization: `Bearer ${keyInput.value}` }
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'ไม่สามารถเข้าสู่ระบบผู้ดูแลได้');
+                adminKey = keyInput.value;
+                keyInput.value = '';
+                await loadAdminCars();
+                loginForm.classList.add('hidden');
+                workspace.classList.remove('hidden');
+            } catch (error) {
+                adminKey = '';
+                loginMessage.textContent = error.message || 'ไม่สามารถเชื่อมต่อระบบได้';
+            } finally {
+                loginButton.disabled = false;
+            }
+        });
+
+        document.getElementById('logoutButton').addEventListener('click', () => {
+            adminKey = '';
+            resetCarForm();
+            loginForm.classList.remove('hidden');
+            workspace.classList.add('hidden');
+            loginMessage.textContent = '';
+            carMessage.textContent = '';
+            keyInput.focus();
+        });
+
+        carForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            if (!carForm.reportValidity()) return;
+            const wasEditing = editingCarId !== null;
+            const formData = new FormData(carForm);
+            formData.delete('images');
+            if (!formData.get('transmission')) formData.set('transmission', 'ไม่ระบุ');
+            if (!formData.get('fuel')) formData.set('fuel', 'ไม่ระบุ');
+            formData.set('is_featured', carForm.elements.is_featured.checked ? '1' : '0');
+            formData.set('is_hot_deal', carForm.elements.is_hot_deal.checked ? '1' : '0');
+            const imageFiles = Array.from(imageInput.files);
+            imageFiles.forEach(file => formData.append('images', file));
+
+            saveButton.disabled = true;
+            carMessage.className = 'sm:col-span-2 text-sm';
+            carMessage.textContent = '';
+            try {
+                const endpoint = wasEditing ? `/api/cars/${editingCarId}` : '/api/cars';
+                const response = await fetch(endpoint, {
+                    method: wasEditing ? 'PUT' : 'POST',
+                    headers: {
+                        Authorization: `Bearer ${adminKey}`
+                    },
+                    body: formData
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        adminKey = '';
+                        workspace.classList.add('hidden');
+                        loginForm.classList.remove('hidden');
+                        throw new Error('สิทธิ์หมดอายุหรือกุญแจไม่ถูกต้อง กรุณาเข้าสู่ระบบอีกครั้ง');
+                    }
+                    throw new Error(result.error || 'บันทึกข้อมูลรถไม่สำเร็จ');
+                }
+
+                resetCarForm();
+                await loadAdminCars();
+                carMessage.classList.add('text-green-700');
+                carMessage.textContent = `${wasEditing ? 'แก้ไข' : 'บันทึก'}ข้อมูลรถเรียบร้อยแล้ว รหัสรถ ${result.id}${result.uploadedFiles ? ` พร้อมรูปภาพ ${result.uploadedFiles} รูป` : ''}`;
+            } catch (error) {
+                carMessage.classList.add('text-red-700');
+                carMessage.textContent = error.message || 'ไม่สามารถบันทึกข้อมูลรถได้';
+            } finally {
+                saveButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

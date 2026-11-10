@@ -1,0 +1,70 @@
+:root {
+  /* Surface & Backgrounds */
+  --bg-main: #090B0E;           /* Obsidian Deep Black */
+  --bg-surface: #12161F;        /* Matte Chassis Slate */
+  --bg-surface-hover: #1A202C;  /* Elevated Card Surface */
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-active: rgba(255, 46, 77, 0.4);
+
+  /* Accents & Brand Colors */
+  --brand-red: #FF2E4D;         /* Apex Crimson (ใช้เป็นจุดโฟกัส CTA) */
+  --brand-gold: #D4AF37;        /* Certified 5-Year Warranty Tag */
+  --text-primary: #F1F5F9;      /* Pure Crisp White */
+  --text-muted: #64748B;        /* Cool Gray Specs */
+  --text-telemetry: #94A3B8;    /* Technical Data Color */
+
+  /* Typography */
+  --font-display: 'Kanit', -apple-system, sans-serif;
+  --font-numeric: 'Chakra Petch', 'Space Mono', monospace; /* ให้ฟีลหน้าปัดไมล์รถ */
+}
+/* Custom Vehicles Card (Non-AI Look) */
+.car-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px; /* ปรับจากมนโค้งเป็นขอบคมประณีต */
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+}
+
+.car-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-active);
+}
+
+/* Image Zoom with Crisp Mask */
+.car-card .img-wrapper {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #000;
+}
+
+.car-card .img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.92) contrast(1.05);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.car-card:hover .img-wrapper img {
+  transform: scale(1.04);
+  filter: brightness(1) contrast(1.08);
+}
+
+/* Badge การรับประกัน 5 ปี / 50,000 กม. */
+.warranty-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(9, 11, 14, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: var(--brand-gold);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  text-transform: uppercase;
+}

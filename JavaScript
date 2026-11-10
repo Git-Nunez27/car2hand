@@ -1,0 +1,213 @@
+// server.js
+const express = require('express');
+const mysql = require('mysql2');
+const cors = require('cors');
+const { timingSafeEqual } = require('crypto');
+
+const app = express();
+app.use(cors());
+app.use(express.json({ limit: '1mb' }));
+
+// ตั้งค่าการเชื่อมต่อฐานข้อมูล SQL
+const db = mysql.createConnection({
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'car_sales_db'
+});
+
+db.connect((err) => {
+    if (err) throw err;
+    console.log('Connected to SQL Database');
+});
+
+function requireCarAdmin(req, res, next) {
+    const adminKey = process.env.CAR_ADMIN_API_KEY;
+    if (!adminKey) {
+        return res.status(503).json({ error: 'Car creation is unavailable until CAR_ADMIN_API_KEY is configured.' });
+    }
+
+    const authorization = req.get('authorization') || '';
+    const suppliedKey = authorization.match(/^Bearer\s+(.+)$/i)?.[1];
+    if (!suppliedKey) {
+        return res.status(401).json({ error: 'A valid admin bearer token is required.' });
+    }
+
+    const expected = Buffer.from(adminKey);
+    const supplied = Buffer.from(suppliedKey);
+    if (expected.length !== supplied.length || !timingSafeEqual(expected, supplied)) {
+        return res.status(401).json({ error: 'A valid admin bearer token is required.' });
+    }
+
+    next();
+}
+
+// Return the public inventory in the shape used by the showroom page.
+app.get('/api/cars', (req, res) => {
+    const sql = `SELECT
+        id,
+        brand AS make,
+        model,
+        trim,
+        manufacture_year AS year,
+        price,
+        was_price AS wasPrice,
+        mileage,
+        body_type AS bodyType,
+        transmission,
+        fuel,
+        engine,
+        color,
+        is_featured AS isFeatured,
+        is_hot_deal AS isHotDeal,
+        warranty_years AS warrantyYears,
+        image_url AS image,
+        description
+        FROM cars
+        WHERE status = 'available'
+        ORDER BY created_at DESC`;
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('Error fetching cars:', err);
+            return res.status(500).json({ error: 'Unable to load cars.' });
+        }
+        res.json(results);
+    });
+});
+
+// Create an available car. This write endpoint is restricted to the admin API key.
+app.post('/api/cars', requireCarAdmin, (req, res) => {
+    const {
+        brand, model, trim = '', manufacture_year, mileage, price,
+        was_price = null, body_type = 'Sedan', transmission = 'ไม่ระบุ',
+        fuel = 'ไม่ระบุ', engine = '', color = null, license_plate = null,
+        image_url = null, is_featured = true, is_hot_deal = false,
+        warranty_years = 5, description = null
+    } = req.body || {};
+    const currentYear = new Date().getFullYear();
+    const isText = (value, maxLength, allowEmpty = false) =>
+        typeof value === 'string' && value.length <= maxLength && (allowEmpty || value.trim().length > 0);
+    const isOptionalText = (value, maxLength) =>
+        value === null || value === undefined || isText(value, maxLength, true);
+    const isNonNegativeInteger = value =>
+        value !== '' && value !== null && value !== undefined &&
+        Number.isInteger(Number(value)) && Number(value) >= 0;
+    const isPositivePrice = value =>
+        value !== '' && value !== null && value !== undefined &&
+        Number.isFinite(Number(value)) && Number(value) > 0 && Number(value) <= 99999999.99;
+    const validImageUrl = value =>
+        value === null || value === undefined || (
+            isText(value, 500, true) &&
+            (value === '' || value.startsWith('/uploads/') || /^https?:\/\/\S+$/i.test(value))
+        );
+
+    if (
+        !isText(brand, 50) ||
+        !isText(model, 100) ||
+        !isText(trim, 100, true) ||
+        !Number.isInteger(Number(manufacture_year)) ||
+        Number(manufacture_year) < 1886 ||
+        Number(manufacture_year) > currentYear + 1 ||
+        !isNonNegativeInteger(mileage) ||
+        !isPositivePrice(price) ||
+        (was_price !== null && was_price !== undefined && !isPositivePrice(was_price)) ||
+        !isText(body_type, 40) ||
+        !isText(transmission, 40) ||
+        !isText(fuel, 40) ||
+        !isText(engine, 50, true) ||
+        !isOptionalText(color, 30) ||
+        !isOptionalText(license_plate, 20) ||
+        !validImageUrl(image_url) ||
+        ![true, false, 0, 1].includes(is_featured) ||
+        ![true, false, 0, 1].includes(is_hot_deal) ||
+        !Number.isInteger(Number(warranty_years)) ||
+        Number(warranty_years) < 0 ||
+        Number(warranty_years) > 20 ||
+        !isOptionalText(description, 10000)
+    ) {
+        return res.status(400).json({ error: 'Invalid car data. Check required fields, value ranges, and text lengths.' });
+    }
+
+    const sql = `INSERT INTO cars (
+        brand, model, trim, manufacture_year, mileage, price, was_price,
+        body_type, transmission, fuel, engine, color, license_plate,
+        image_url, is_featured, is_hot_deal, warranty_years, description, status
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'available')`;
+    const values = [
+        brand.trim(), model.trim(), trim.trim(), Number(manufacture_year),
+        Number(mileage), Number(price), was_price === null ? null : Number(was_price),
+        body_type.trim(), transmission.trim(), fuel.trim(), engine.trim(),
+        color?.trim() || null, license_plate?.trim() || null, image_url?.trim() || null,
+        Boolean(is_featured), Boolean(is_hot_deal), Number(warranty_years),
+        description?.trim() || null
+    ];
+
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            console.error('Error creating car:', err);
+            return res.status(500).json({ error: 'Unable to create car.' });
+        }
+        res.status(201).json({ message: 'Car created successfully.', id: result.insertId });
+    });
+});
+
+// 2. API สำหรับรับข้อมูลลูกค้าที่สนใจ (บันทึกลงตาราง Leads)
+app.post('/api/leads', (req, res) => {
+    const { customer_name, phone_number, line_id, car_id, inquiry_message } = req.body;
+    const sql = "INSERT INTO leads (customer_name, phone_number, line_id, car_id, inquiry_message) VALUES (?, ?, ?, ?, ?)";
+    
+    db.query(sql, [customer_name, phone_number, line_id, car_id, inquiry_message], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.status(201).json({ message: 'Lead saved successfully', lead_id: result.insertId });
+    });
+});
+
+// รันเซิร์ฟเวอร์
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+// เพิ่มการเรียกใช้ multer และ path ด้านบนสุดของไฟล์
+const multer = require('multer');
+const path = require('path');
+
+// -----------------------------------------
+// ตั้งค่า Multer สำหรับการจัดเก็บไฟล์
+// -----------------------------------------
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/'); // ไฟล์จะถูกเก็บไว้ในโฟลเดอร์ uploads (ต้องสร้างโฟลเดอร์นี้ไว้ด้วย)
+    },
+    filename: (req, file, cb) => {
+        // ตั้งชื่อไฟล์ใหม่ด้วย Timestamp เพื่อป้องกันชื่อไฟล์ซ้ำกัน
+        cb(null, Date.now() + path.extname(file.originalname)); 
+    }
+});
+const upload = multer({ storage: storage });
+
+// เปิดให้เข้าถึงโฟลเดอร์ uploads ผ่าน URL ได้โดยตรง (สำหรับให้หน้าเว็บดึงรูปไปแสดง)
+app.use('/uploads', express.static('uploads'));
+
+// -----------------------------------------
+// API สำหรับอัปโหลดรูปภาพรถยนต์ (รองรับอัปโหลดพร้อมกันสูงสุด 5 รูป)
+// -----------------------------------------
+app.post('/api/cars/:car_id/images', upload.array('images', 5), (req, res) => {
+    const carId = req.params.car_id;
+    const files = req.files;
+
+    if (!files || files.length === 0) { 
+        return res.status(400).json({ error: 'กรุณาแนบไฟล์รูปภาพ' });
+    }
+
+    // สร้างชุดข้อมูลเพื่อบันทึกลง SQL แบบ Multiple Insert
+    const imageRecords = files.map(file => [carId, `/uploads/${file.filename}`]);
+    const sql = "INSERT INTO car_images (car_id, image_url) VALUES ?";
+
+    db.query(sql, [imageRecords], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.status(201).json({ 
+            message: 'อัปโหลดรูปภาพสำเร็จ', 
+            uploadedfiles: files.length 
+        });
+    });
+});

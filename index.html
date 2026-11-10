@@ -1,0 +1,1912 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARS27 | Premium Used Cars</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Google Fonts: Kanit, Chakra Petch & Space Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Kanit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: {
+                            base: '#090B0E',
+                            surface: '#12161F',
+                            elevated: '#1A202C',
+                            border: 'rgba(255, 255, 255, 0.08)',
+                            borderHover: 'rgba(255, 46, 77, 0.4)'
+                        },
+                        apex: {
+                            red: '#FF2E4D',
+                            redHover: '#E01E3C',
+                            gold: '#D4AF37',
+                            emerald: '#10B981',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Kanit', 'sans-serif'],
+                        mono: ['Space Mono', 'Chakra Petch', 'monospace'],
+                        display: ['Chakra Petch', 'Kanit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* LUXURY MINIMAL THEME */
+        :root {
+            --bg: #f4f0ee;
+            --panel: #ffffff;
+            --panel-alt: #f8f5f3;
+            --line: rgba(17, 24, 39, 0.08);
+            --text: #171b20;
+            --muted: #5f676e;
+            --red: #b9122d;
+            --red-soft: #f8e9ec;
+            --gold: #b8965a;
+            --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        }
+
+        .telemetry-num {
+            font-family: 'Space Mono', 'Chakra Petch', monospace;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.03em;
+        }
+
+        .telemetry-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            transition: all 0.25s ease;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.03);
+        }
+
+        .telemetry-card:hover {
+            border-color: rgba(185, 18, 45, 0.18);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .img-mask-16-10 {
+            position: relative;
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+            background: #eae5e1;
+        }
+
+        .img-mask-16-10 img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: saturate(0.92) contrast(1.02);
+            transition: transform 0.5s ease, filter 0.3s ease;
+        }
+
+        .telemetry-card:hover .img-mask-16-10 img {
+            transform: scale(1.04);
+            filter: saturate(1) contrast(1.03);
+        }
+
+        .img-vignette {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(23, 27, 32, 0.12) 0%, rgba(23, 27, 32, 0.15) 40%, rgba(23, 27, 32, 0.45) 100%);
+            pointer-events: none;
+        }
+
+        .gold-certified-badge {
+            background: rgba(184, 150, 90, 0.08);
+            border: 1px solid rgba(184, 150, 90, 0.35);
+            color: #8b6a30;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            padding: 3px 8px;
+            border-radius: 999px;
+            text-transform: uppercase;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #efeae6;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d6c8c1;
+            border-radius: 999px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--red);
+        }
+
+        .hud-glass-panel {
+            background: rgba(255, 255, 255, 0.86);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--line);
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.04);
+        }
+
+        .btn-apex {
+            background: linear-gradient(135deg, #b9122d 0%, #d72638 100%);
+            color: #fff;
+            font-weight: 700;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+            box-shadow: 0 12px 24px rgba(185, 18, 45, 0.18);
+        }
+
+        .btn-apex:hover {
+            background: linear-gradient(135deg, #a70f2a 0%, #c82034 100%);
+            box-shadow: 0 16px 28px rgba(185, 18, 45, 0.22);
+        }
+
+        .btn-apex:active {
+            transform: scale(0.98);
+        }
+
+        .btn-slate-outline {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(17, 24, 39, 0.09);
+            color: #1d2228;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-slate-outline:hover {
+            background: #fff;
+            border-color: rgba(17, 24, 39, 0.15);
+            color: #111827;
+        }
+
+        .tech-corner {
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+        }
+
+        body {
+            background: linear-gradient(180deg, #f5f2f0 0%, #f3efec 100%);
+            color: #1a1d20;
+        }
+
+        body .bg-obsidian-base,
+        body .bg-obsidian-surface,
+        body .bg-obsidian-elevated,
+        body .bg-slate-900,
+        body .bg-slate-950,
+        body .bg-slate-800,
+        body .bg-stone-900,
+        body .text-slate-100,
+        body .text-slate-200,
+        body .text-slate-300,
+        body .text-slate-400,
+        body .text-slate-500,
+        body .text-slate-600,
+        body .text-slate-700,
+        body .text-slate-800,
+        body .text-slate-900,
+        body .text-white {
+            color: #1a1d20 !important;
+        }
+
+        body .bg-obsidian-base,
+        body .bg-obsidian-surface,
+        body .bg-obsidian-elevated,
+        body .bg-slate-900,
+        body .bg-slate-950,
+        body .bg-slate-800,
+        body .bg-stone-900 {
+            background: #ffffff !important;
+        }
+
+        body > div:first-child {
+            background: linear-gradient(90deg, #101114 0%, #1d2025 22%, #b9122d 54%, #d72638 100%) !important;
+            color: #ffffff !important;
+            border-bottom: 1px solid rgba(255,255,255,0.10);
+            box-shadow: 0 14px 40px rgba(27, 25, 28, 0.15);
+        }
+
+        body > div:first-child * {
+            color: #ffffff !important;
+        }
+
+        body > div:first-child strong {
+            color: #ffffff !important;
+        }
+
+        body header {
+            background: rgba(255, 255, 255, 0.88) !important;
+            border-bottom: 1px solid rgba(17, 24, 39, 0.08) !important;
+            backdrop-filter: blur(14px);
+        }
+
+        body header * {
+            color: #1a1d20 !important;
+        }
+
+        body header .bg-apex-red,
+        body header .bg-red-600,
+        body header .bg-brand-600,
+        body button.bg-gradient-to-r,
+        body a.bg-gradient-to-r {
+            color: #fff !important;
+        }
+
+        body .text-apex-red,
+        body .text-brand-500,
+        body .text-red-500,
+        body .text-red-400,
+        body .text-brand-400,
+        body .text-apex-gold {
+            color: #b9122d !important;
+        }
+
+        body .bg-apex-red,
+        body .bg-red-600,
+        body .bg-brand-600,
+        body .bg-gradient-to-r.from-rose-600.to-red-600,
+        body .bg-gradient-to-r.from-red-600.to-red-500,
+        body .bg-gradient-to-r.from-[#b9122d].to-[#d72638] {
+            background: linear-gradient(135deg, #1d2025 0%, #b9122d 42%, #d72638 100%) !important;
+        }
+
+        body .border-white\/10,
+        body .border-slate-700,
+        body .border-slate-800,
+        body .border-slate-600,
+        body .border-slate-500,
+        body .border-slate-200,
+        body .border-black\/5 {
+            border-color: rgba(17, 24, 39, 0.09) !important;
+        }
+
+        body .shadow-lg,
+        body .shadow-brand-600\/20,
+        body .shadow-apex-red\/30 {
+            box-shadow: 0 16px 30px rgba(17, 24, 39, 0.08) !important;
+        }
+
+        /* Photo-led luxury used-car showroom */
+        #hero-showcase {
+            background: linear-gradient(180deg, #fff 0%, #f7f4f1 100%) !important;
+            border-bottom: 1px solid rgba(17, 24, 39, 0.08) !important;
+        }
+
+        #hero-showcase > .max-w-7xl > .grid {
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            gap: 2rem;
+        }
+
+        #hero-showcase .hero-copy {
+            grid-column: span 5 / span 5;
+        }
+
+        #hero-showcase .hero-feature {
+            grid-column: span 7 / span 7;
+        }
+
+        #hero-showcase .hero-feature .telemetry-card {
+            padding: 1.25rem;
+            border-radius: 1.25rem;
+            box-shadow: 0 22px 55px rgba(28, 24, 22, 0.12);
+        }
+
+        #hero-showcase .hero-feature .img-mask-16-10 {
+            aspect-ratio: 1.6 / 1;
+            border: 0 !important;
+            border-radius: 0.9rem;
+            background: #e8e4e0;
+        }
+
+        #hero-showcase .hero-feature .img-mask-16-10 img,
+        .telemetry-card .img-mask-16-10 img {
+            filter: none;
+        }
+
+        .telemetry-card .img-mask-16-10 .bg-apex-red,
+        .telemetry-card .img-mask-16-10 button,
+        #hero-showcase .hero-feature .img-mask-16-10 .bg-obsidian-base\/90 {
+            color: #fff !important;
+        }
+
+        .telemetry-card .img-mask-16-10 .bg-obsidian-base\/90,
+        .telemetry-card .img-mask-16-10 button,
+        #hero-showcase .hero-feature .img-mask-16-10 .bg-obsidian-base\/90 {
+            background: rgba(17, 19, 22, 0.78) !important;
+            border-color: rgba(255, 255, 255, 0.22) !important;
+        }
+
+        #hero-showcase .img-vignette {
+            background: linear-gradient(180deg, transparent 55%, rgba(12, 14, 17, 0.44) 100%);
+        }
+
+        #hero-showcase .hero-copy h1 {
+            font-size: clamp(2.4rem, 4vw, 4.2rem);
+            line-height: 1.12;
+            letter-spacing: -0.035em;
+            text-transform: none;
+        }
+
+        #hero-showcase .hero-copy h1 > span {
+            background: none;
+            color: #b9122d;
+        }
+
+        #hero-showcase .hero-copy > p {
+            color: #5f676e !important;
+            font-size: 1rem;
+            line-height: 1.9;
+        }
+
+        #hero-showcase .hero-copy .grid {
+            border-color: rgba(17, 24, 39, 0.1) !important;
+        }
+
+        #hero-showcase .hero-feature .featured-price {
+            color: #b9122d !important;
+            font-size: clamp(1.7rem, 2.4vw, 2.25rem);
+            letter-spacing: -0.04em;
+            white-space: nowrap;
+        }
+
+        #hero-showcase .hero-feature .feature-title {
+            font-size: 1.3rem;
+        }
+
+        #inventory,
+        #hot-deals {
+            background-color: #f7f4f1 !important;
+        }
+
+        #inventory .inventory-heading,
+        #hot-deals .deals-heading {
+            border-color: rgba(17, 24, 39, 0.1) !important;
+        }
+
+        #featuredGrid,
+        #hotDealsGrid {
+            gap: 1.5rem;
+        }
+
+        .telemetry-card {
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 8px 26px rgba(25, 22, 20, 0.06);
+        }
+
+        .telemetry-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 42px rgba(25, 22, 20, 0.12);
+        }
+
+        .telemetry-card .img-mask-16-10 {
+            aspect-ratio: 4 / 3;
+        }
+
+        .telemetry-card .listing-price {
+            color: #b9122d !important;
+            display: inline-block;
+            font-size: clamp(1.45rem, 1.8vw, 1.85rem);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.045em;
+            white-space: nowrap;
+        }
+
+        .telemetry-card .monthly-label {
+            color: #77736f !important;
+        }
+
+        .telemetry-card .btn-slate-outline {
+            min-height: 42px;
+        }
+
+        .btn-apex,
+        .btn-apex * {
+            color: #fff !important;
+        }
+
+        @media (min-width: 768px) and (max-width: 1100px) {
+            body header > .max-w-7xl {
+                gap: 0.75rem;
+            }
+
+            body header nav {
+                gap: 0.7rem !important;
+                font-size: 0.62rem !important;
+                white-space: nowrap;
+            }
+
+            body header nav a {
+                white-space: nowrap;
+            }
+
+            body header a[href^="tel"] > div {
+                display: none;
+            }
+        }
+
+        @media (max-width: 1023px) {
+            #hero-showcase .hero-copy,
+            #hero-showcase .hero-feature {
+                grid-column: span 12 / span 12;
+            }
+
+            #hero-showcase .hero-feature {
+                grid-row: 1;
+            }
+
+            #hero-showcase .hero-copy {
+                grid-row: 2;
+            }
+        }
+
+        @media (max-width: 640px) {
+            #hero-showcase {
+                padding-top: 1.5rem;
+                padding-bottom: 2.5rem;
+            }
+
+            #hero-showcase .hero-feature .telemetry-card {
+                padding: 0.75rem;
+            }
+
+            #hero-showcase .hero-feature .img-mask-16-10 {
+                aspect-ratio: 4 / 3;
+            }
+
+            #hero-showcase .hero-feature .featured-price {
+                font-size: 1.55rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-obsidian-base text-slate-200 font-sans antialiased min-h-screen flex flex-col selection:bg-apex-red selection:text-white">
+
+    <!-- TOP TELEMETRY ANNOUNCEMENT BAR -->
+    <div class="bg-gradient-to-r from-obsidian-elevated via-obsidian-surface to-obsidian-elevated border-b border-white/10 text-xs py-2 px-4 text-center tracking-wide flex items-center justify-center gap-3 relative z-50">
+        <span class="inline-flex items-center gap-1.5 text-apex-gold font-mono font-bold text-[10px] uppercase px-2 py-0.5 bg-apex-gold/10 border border-apex-gold/30 rounded-sm">
+            <i class="fa-solid fa-certificate"></i> CERTIFIED WARRANTY
+        </span>
+        <span class="text-slate-300 text-[11px]">
+            รถยนต์ CARS27 ทุกคันผ่านการตรวจเช็ก <strong class="text-white">175 จุด</strong> รับประกันสูงสุด <strong class="text-apex-gold">5 ปี / 50,000 กม.</strong> พร้อมบริการช่วยเหลือฉุกเฉิน 24 ชม.
+        </span>
+        <a href="#inventory" class="text-apex-red hover:underline ml-2 font-mono text-[11px] font-bold hidden md:inline">ชมรายการรถยนต์ &rarr;</a>
+    </div>
+
+    <!-- MAIN TECHNICAL NAVBAR -->
+    <header class="sticky top-0 z-40 bg-obsidian-base/90 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 bg-apex-red rounded-sm flex items-center justify-center shadow-lg shadow-apex-red/30 group-hover:scale-105 transition-transform tech-corner">
+                    <span class="font-display font-black text-xl text-white tracking-tighter">27</span>
+                </div>
+                <div class="flex flex-col">
+                    <div class="flex items-center gap-1">
+                        <span class="text-2xl font-display font-black tracking-wider text-white">CARS27</span>
+                    </div>
+                    <span class="text-[9px] font-mono text-slate-400 tracking-widest uppercase -mt-1">PREMIUM USED CARS</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center gap-8 text-xs font-semibold tracking-wider text-slate-300 uppercase font-display">
+                <a href="#inventory" class="hover:text-apex-red transition flex items-center gap-1.5">
+                    <span>รถยนต์ทั้งหมด</span>
+                </a>
+                <a href="#hot-deals" class="hover:text-apex-red transition flex items-center gap-1.5 text-apex-red">
+                    <i class="fa-solid fa-bolt text-xs"></i>
+                    <span>HOT DEALS</span>
+                </a>
+                <a href="javascript:void(0)" onclick="openTradeInModal()" class="hover:text-white transition">แลกเปลี่ยน / ขายรถ</a>
+                <a href="#warranty" class="hover:text-white transition">การรับประกัน 5 ปี</a>
+                <a href="#showroom" class="hover:text-white transition">ศูนย์บริการ</a>
+            </nav>
+
+            <!-- Action Buttons & Wishlist -->
+            <div class="flex items-center gap-3">
+                <!-- Phone Hotline Button -->
+                <a href="tel:1532" class="hidden sm:flex items-center gap-2.5 bg-obsidian-elevated hover:bg-slate-800 border border-white/10 px-3.5 py-2 rounded-sm text-xs font-mono transition">
+                    <i class="fa-solid fa-headset text-apex-red text-sm"></i>
+                    <div>
+                        <div class="text-[9px] text-slate-400 uppercase leading-none">HOTLINE</div>
+                        <div class="text-xs font-bold text-white telemetry-num">1532</div>
+                    </div>
+                </a>
+
+                <!-- Favorites Counter Button -->
+                <button onclick="toggleFavoritesDrawer()" class="relative p-2.5 rounded-sm bg-obsidian-elevated hover:bg-slate-800 border border-white/10 text-slate-200 transition">
+                    <i class="fa-regular fa-heart text-sm"></i>
+                    <span id="favCount" class="absolute -top-1.5 -right-1.5 bg-apex-red text-white text-[10px] font-mono font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-obsidian-base hidden">0</span>
+                </button>
+
+                <!-- Sell My Car CTA -->
+                <button onclick="openTradeInModal()" class="btn-apex text-xs uppercase tracking-wider px-4 py-2.5 flex items-center gap-2">
+                    <i class="fa-solid fa-car-side"></i>
+                    <span class="font-display">ประเมินราคาขาย</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION & INDUSTRIAL CERTIFICATION HEADER -->
+    <section id="hero-showcase" class="relative bg-gradient-to-b from-obsidian-surface via-obsidian-base to-obsidian-base pt-12 pb-16 overflow-hidden border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+                
+                <!-- Hero Left Content -->
+                <div class="hero-copy lg:col-span-7 space-y-6">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 text-slate-300 text-xs font-mono tracking-widest uppercase">
+                        <span class="w-2 h-2 rounded-full bg-apex-red animate-ping"></span>
+                        <span>CERTIFIED AUTOMOTIVE STANDARDS</span>
+                    </div>
+
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display font-black tracking-tight text-white leading-[1.08] uppercase">
+                        รถมือสองคัดพิเศษ <br/>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-apex-red via-red-400 to-amber-400">
+                            หรู คุ้มค่า มั่นใจได้
+                        </span>
+                    </h1>
+
+                    <p class="text-slate-400 text-sm sm:text-base max-w-2xl font-light leading-relaxed">
+                        ศูนย์รวมรถยนต์มือสองคัดเกรดพรีเมียม ผ่านการตรวจสภาพตามมาตรฐาน 175 จุด โครงสร้างตัวถังเดิม 100% ไม่เคยชนหนัก ไม่เคยพลิกคว้า ไม่เคยจมน้ำ การันตีวารันตีสูงสุด 5 ปี หรือ 50,000 กิโลเมตร
+                    </p>
+
+                    <!-- Technical Metrics Grid -->
+                    <div class="grid grid-cols-3 gap-4 pt-4 max-w-xl border-t border-white/10">
+                        <div class="space-y-1">
+                            <div class="text-xs font-mono text-slate-400 uppercase">INSPECTION</div>
+                            <div class="text-2xl font-mono font-bold text-white telemetry-num">175 <span class="text-xs font-sans text-apex-red">POINTS</span></div>
+                            <div class="text-[11px] text-slate-500">Master Tech Certified</div>
+                        </div>
+                        <div class="space-y-1 border-l border-white/10 pl-4">
+                            <div class="text-xs font-mono text-slate-400 uppercase">WARRANTY</div>
+                            <div class="text-2xl font-mono font-bold text-apex-gold telemetry-num">5 <span class="text-xs font-sans">YEARS</span></div>
+                            <div class="text-[11px] text-slate-500">Up to 50,000 KM</div>
+                        </div>
+                        <div class="space-y-1 border-l border-white/10 pl-4">
+                            <div class="text-xs font-mono text-slate-400 uppercase">GUARANTEE</div>
+                            <div class="text-2xl font-mono font-bold text-emerald-400 telemetry-num">100%</div>
+                            <div class="text-[11px] text-slate-500">No Flood & Crash</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Right Feature Showcase Card -->
+                <div class="hero-feature lg:col-span-5">
+                    <div class="telemetry-card p-4 relative group">
+                        <!-- Top Tag -->
+                        <div class="flex justify-between items-center mb-3 text-xs font-mono">
+                            <span class="gold-certified-badge"><i class="fa-solid fa-shield-halved"></i> CARS27 FEATURED</span>
+                            <span class="text-slate-400">ID: CX-2018-892</span>
+                        </div>
+
+                        <!-- 16:10 Image Frame -->
+                        <div class="img-mask-16-10 mb-4 rounded-sm border border-white/10">
+                            <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1000&q=80" alt="Toyota Innova Crysta">
+                            <div class="img-vignette"></div>
+                            <div class="absolute bottom-3 left-3 bg-obsidian-base/90 border border-white/10 px-2.5 py-1 text-[11px] font-mono text-slate-300">
+                                <i class="fa-solid fa-gauge text-apex-red mr-1"></i> 78,000 KM
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-xs font-mono text-slate-400 uppercase">2018 TOYOTA</span>
+                                    <h3 class="feature-title text-lg font-display font-bold text-white">INNOVA 2.8 CRYSTA V</h3>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] text-slate-400 block font-mono uppercase">CASH PRICE</span>
+                                    <span class="featured-price text-2xl font-mono font-bold text-white telemetry-num">฿559,000</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-2 text-center text-xs font-mono bg-obsidian-base/60 p-2.5 border border-white/5 text-slate-300">
+                                <div><span class="text-[10px] text-slate-500 block">ENGINE</span>2.8L Diesel</div>
+                                <div><span class="text-[10px] text-slate-500 block">GEAR</span>Auto 6-Spd</div>
+                                <div><span class="text-[10px] text-slate-500 block">BODY</span>MPV 7-Seat</div>
+                            </div>
+
+                            <button onclick="openCarDetailModal(1)" class="w-full btn-slate-outline py-2.5 text-xs font-display font-bold uppercase tracking-wider flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-list-check text-apex-red"></i> ตรวจสอบสเปกและผลตรวจ 175 จุด
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HIGH-DENSITY STICKY CONTROL DASHBOARD (SEARCH & FILTER BAR) -->
+            <div id="search-section" class="mt-12 hud-glass-panel p-5 sm:p-6 rounded-sm shadow-2xl relative z-20">
+                <form id="filterForm" onsubmit="event.preventDefault(); filterCars();" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                        <!-- Search Keyword Input -->
+                        <div>
+                            <label class="block text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1.5">ค้นหารุ่น / คีย์เวิร์ด</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                                <input type="text" id="searchInput" placeholder="เช่น Innova, HR-V, Accord..." 
+                                    class="w-full bg-obsidian-base border border-white/10 rounded-sm pl-9 pr-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-apex-red transition font-sans">
+                            </div>
+                        </div>
+
+                        <!-- Brand / Make Filter -->
+                        <div>
+                            <label class="block text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1.5">แบรนด์รถยนต์ (MAKE)</label>
+                            <select id="makeFilter" onchange="filterCars()" class="w-full bg-obsidian-base border border-white/10 rounded-sm px-3 py-2 text-xs text-white focus:outline-none focus:border-apex-red transition font-sans">
+                                <option value="ALL">ทุกแบรนด์ (All Makes)</option>
+                                <option value="Toyota">Toyota</option>
+                                <option value="Honda">Honda</option>
+                                <option value="Mazda">Mazda</option>
+                                <option value="MG">MG</option>
+                                <option value="Mercedes-Benz">Mercedes-Benz</option>
+                            </select>
+                        </div>
+
+                        <!-- Body Style Filter -->
+                        <div>
+                            <label class="block text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1.5">ประเภทตัวถัง (BODY)</label>
+                            <select id="bodyFilter" onchange="filterCars()" class="w-full bg-obsidian-base border border-white/10 rounded-sm px-3 py-2 text-xs text-white focus:outline-none focus:border-apex-red transition font-sans">
+                                <option value="ALL">ทุกประเภท (All Body Types)</option>
+                                <option value="SUV">SUV / Crossover</option>
+                                <option value="MPV">MPV / Minivan</option>
+                                <option value="Sedan">Sedan</option>
+                                <option value="Hatchback">Hatchback</option>
+                                <option value="Van">Passenger & Commercial Van</option>
+                            </select>
+                        </div>
+
+                        <!-- Max Budget Filter -->
+                        <div>
+                            <label class="block text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1.5">งบประมาณสูงสุด (MAX PRICE)</label>
+                            <select id="priceFilter" onchange="filterCars()" class="w-full bg-obsidian-base border border-white/10 rounded-sm px-3 py-2 text-xs text-white focus:outline-none focus:border-apex-red transition font-sans">
+                                <option value="ALL">ไม่จำกัดงบประมาณ</option>
+                                <option value="300000">ไม่เกิน ฿300,000</option>
+                                <option value="600000">ไม่เกิน ฿600,000</option>
+                                <option value="1000000">ไม่เกิน ฿1,000,000</option>
+                                <option value="1500000">ไม่เกิน ฿1,500,000</option>
+                            </select>
+                        </div>
+
+                        <!-- Sorting Filter -->
+                        <div>
+                            <label class="block text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1.5">เรียงลำดับ (SORT BY)</label>
+                            <select id="sortFilter" onchange="filterCars()" class="w-full bg-obsidian-base border border-white/10 rounded-sm px-3 py-2 text-xs text-white focus:outline-none focus:border-apex-red transition font-sans">
+                                <option value="recommended">แนะนำ (Recommended)</option>
+                                <option value="price-asc">ราคา: น้อยไปมาก</option>
+                                <option value="price-desc">ราคา: มากไปน้อย</option>
+                                <option value="year-desc">ปีใหม่ล่าสุด</option>
+                                <option value="mileage-asc">เลขไมล์น้อยที่สุด</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-3 border-t border-white/10 text-xs">
+                        <div class="flex items-center gap-3">
+                            <span class="text-slate-400 font-mono text-[11px]">RESULTS:</span>
+                            <span id="activeFilterBadge" class="bg-apex-red/10 border border-apex-red/30 text-apex-red font-mono px-2.5 py-0.5 rounded-sm text-[11px] font-bold">12 VEHICLES FOUND</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button type="button" onclick="resetFilters()" class="text-xs text-slate-400 hover:text-white transition font-mono flex items-center gap-1">
+                                <i class="fa-solid fa-rotate-left text-[10px]"></i> รีเซ็ตตัวกรอง
+                            </button>
+                            <button type="submit" class="btn-apex px-5 py-2 text-xs uppercase font-display">
+                                ค้นหาทันที
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- INVENTORY GRID SECTION (ASYMMETRICAL TELEMETRY CARDS) -->
+    <section id="inventory" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="inventory-heading flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4 border-b border-white/10 pb-4">
+            <div>
+                <div class="flex items-center gap-2 text-apex-red text-xs font-mono font-bold tracking-widest uppercase mb-1">
+                    <i class="fa-solid fa-car-burst"></i>
+                    <span>CARS27 CERTIFIED FLEET</span>
+                </div>
+                <h2 class="text-3xl font-display font-black text-white uppercase">รายการรถยนต์เข้าใหม่แนะนำ</h2>
+                <p class="text-slate-400 text-xs mt-1">ผ่านการตรวจสภาพ 175 จุด พร้อมการรับประกัน 5 ปี / 50,000 กม.</p>
+            </div>
+            <div class="text-xs font-mono text-slate-400">
+                DISPLAYING <span id="inventoryCount" class="text-apex-gold font-bold">6</span> CERTIFIED CARS
+                <span id="inventorySourceStatus" class="block text-[10px] mt-1" role="status">กำลังโหลดรายการรถ...</span>
+            </div>
+        </div>
+
+        <!-- Inventory Telemetry Grid -->
+        <div id="featuredGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamically populated via JS -->
+        </div>
+    </section>
+
+    <!-- HOT DEALS & LUXURY FLEET SECTION -->
+    <section id="hot-deals" class="py-16 bg-obsidian-surface/60 border-y border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="deals-heading flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4 border-b border-white/10 pb-4">
+                <div>
+                    <div class="inline-flex items-center gap-2 bg-apex-red/10 border border-apex-red/30 text-apex-red text-xs font-mono font-bold px-3 py-1 rounded-sm uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-bolt animate-pulse"></i> LIMITED TIME OFFER
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl font-display font-black text-white uppercase">HOT DEALS & LUXURY FLEET</h2>
+                    <p class="text-slate-400 text-xs mt-1">รถยนต์ราคาพิเศษประจำเดือน พร้อมข้อเสนอไฟแนนซ์ดอกเบี้ยต่ำ</p>
+                </div>
+            </div>
+
+            <!-- Hot Deals Grid -->
+            <div id="hotDealsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- TRADE-IN / SELL CAR PROMO BANNER -->
+    <section class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="relative rounded-sm overflow-hidden bg-gradient-to-r from-obsidian-elevated via-obsidian-surface to-obsidian-base border border-apex-red/30 p-8 sm:p-12 shadow-2xl tech-corner">
+            <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div class="lg:col-span-8 space-y-4">
+                    <span class="bg-apex-red text-white text-[10px] font-mono font-bold uppercase px-3 py-1 tracking-widest">VALUATION SERVICE</span>
+                    <h2 class="text-3xl sm:text-4xl font-display font-black text-white leading-tight uppercase">
+                        ต้องการขายรถ หรือแลกเปลี่ยน (TRADE-IN)? <br/>
+                        <span class="text-apex-red">ประเมินราคาทราบผลเบื้องต้นภายใน 30 นาที</span>
+                    </h2>
+                    <p class="text-slate-300 text-xs sm:text-sm max-w-2xl font-light">
+                        บริการประเมินราคารถถึงหน้าบ้านทั่วกรุงเทพฯ ให้ราคาสูง ยุติธรรม จ่ายเงินสดทันที พร้อมดูแลปิดไฟแนนซ์ให้อย่างสะดวกครบวงจร
+                    </p>
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <button onclick="openTradeInModal()" class="btn-apex font-display text-xs px-6 py-3 uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-calculator"></i> ประเมินราคารถของคุณ
+                        </button>
+                        <a href="tel:1532" class="btn-slate-outline font-mono text-xs px-6 py-3 flex items-center gap-2">
+                            <i class="fa-solid fa-phone text-apex-red"></i> โทรประเมินราคา: 0955179042
+                        </a>
+                    </div>
+                </div>
+                <div class="lg:col-span-4 hidden lg:flex justify-end">
+                    <div class="w-44 h-44 rounded-sm bg-apex-red/10 border border-apex-red/30 flex items-center justify-center relative tech-corner">
+                        <i class="fa-solid fa-hand-holding-dollar text-6xl text-apex-red"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CARS27 ASSURANCE & WARRANTY FEATURES -->
+    <section id="warranty" class="py-16 bg-obsidian-base border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="text-3xl font-display font-black text-white uppercase">CARS27 CERTIFIED ASSURANCE</h2>
+                <p class="text-slate-400 text-xs mt-2 font-mono">WHY THOUSANDS TRUST CARS27 FOR THEIR PRE-OWNED VEHICLE</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Feature 1 -->
+                <div class="telemetry-card p-6 space-y-3">
+                    <div class="w-10 h-10 rounded-sm bg-apex-gold/10 text-apex-gold border border-apex-gold/30 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-shield-cat"></i>
+                    </div>
+                    <h3 class="text-base font-display font-bold text-white uppercase">รับประกัน 5 ปี / 50,000 กม.</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed font-light">คุ้มครองเครื่องยนต์ เกียร์ กล่อง ECU และระบบส่งกำลังหลักทั่วประเทศ</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="telemetry-card p-6 space-y-3">
+                    <div class="w-10 h-10 rounded-sm bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <h3 class="text-base font-display font-bold text-white uppercase">ตรวจเช็ก 175 จุดละเอียด</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed font-light">ตรวจเช็กโดยช่างผู้เชี่ยวชาญ ทั้งโครงสร้างตัวถัง ระบบไฟฟ้า และเครื่องยนต์ด้วยคอมพิวเตอร์</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="telemetry-card p-6 space-y-3">
+                    <div class="w-10 h-10 rounded-sm bg-apex-red/10 text-apex-red border border-apex-red/30 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-ban"></i>
+                    </div>
+                    <h3 class="text-base font-display font-bold text-white uppercase">การันตีไม่ชนหนัก-ไม่จมน้ำ</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed font-light">การันตีคืนเงิน 100% หากพบว่ารถมีประวัติชนหนัก ตัดต่อตัวถัง จมน้ำ หรือกรอไมล์</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="telemetry-card p-6 space-y-3">
+                    <div class="w-10 h-10 rounded-sm bg-blue-500/10 text-blue-400 border border-blue-500/30 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3 class="text-base font-display font-bold text-white uppercase">ราคาโปร่งใส ไม่มีหมกเม็ด</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed font-light">ราคาสุทธิที่แจ้งคือราคาจริง ไม่มีค่าธรรมเนียมแอบแฝงหรือค่าดำเนินการซ่อนเร้น</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SHOWROOM LOCATION & CONTACT SECTION -->
+    <section id="showroom" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <!-- Left Info -->
+            <div class="lg:col-span-5 space-y-6">
+                <div class="inline-flex items-center gap-2 text-apex-red text-xs font-mono font-bold uppercase tracking-widest">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <span>FLAGSHIP EXPERIENCE CENTER</span>
+                </div>
+                <h2 class="text-3xl font-display font-black text-white uppercase leading-tight"> CARS27 </h2>
+                <p class="text-slate-400 text-xs sm:text-sm leading-relaxed font-light">
+                    สัมผัสและทดลองขับรถยนต์คัดเกรดพรีเมียมทุกคันได้ในโชว์รูมติดแอร์ในร่ม บนถนนศรีนครินทร์ กรุงเทพมหานคร
+                </p>
+
+                <div class="space-y-3 pt-2">
+                    <div class="flex items-start gap-3 p-3.5 telemetry-card">
+                        <div class="w-9 h-9 rounded-sm bg-apex-red/10 text-apex-red flex items-center justify-center shrink-0 text-sm">
+                            <i class="fa-solid fa-map-pin"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-mono font-bold text-white uppercase">สถานที่ตั้งโชว์รูม</h4>
+                            <p class="text-xs text-slate-400 mt-0.5">811 ชั้น 2 ถนนศรีนครินทร์ แขวงสวนหลวง เขตสวนหลวง กรุงเทพมหานคร 10250</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3.5 telemetry-card">
+                        <div class="w-9 h-9 rounded-sm bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 text-sm">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-mono font-bold text-white uppercase">เวลาทำการ</h4>
+                            <p class="text-xs text-slate-400 mt-0.5">09:00 – 18:00 น. (เปิดทำการทุกวัน ไม่เว้นวันหยุด)</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3.5 telemetry-card">
+                        <div class="w-9 h-9 rounded-sm bg-apex-gold/10 text-apex-gold flex items-center justify-center shrink-0 text-sm">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-mono font-bold text-white uppercase">เบอร์โทรศัพท์สายด่วน</h4>
+                            <p class="text-xs text-slate-400 mt-0.5">HOTLINE: <strong class="text-white font-mono">1532</strong> | LINE: <span class="text-apex-red font-mono">@carsx</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Interactive Map Visual Card -->
+            <div class="lg:col-span-7">
+                <div class="telemetry-card p-3">
+                    <div class="relative h-96 bg-obsidian-base border border-white/10 flex items-center justify-center overflow-hidden">
+                        <div class="absolute inset-0 bg-[radial-gradient(#1A202C_1px,transparent_1px)] [background-size:16px_16px] opacity-60"></div>
+                        <div class="relative z-10 text-center p-6 space-y-4 max-w-md">
+                            <div class="w-14 h-14 bg-apex-red text-white flex items-center justify-center text-2xl mx-auto shadow-xl tech-corner">
+                                <i class="fa-solid fa-building"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-display font-bold text-white uppercase">CARS27 SRINAKARIN FLOOR 2</h3>
+                                <p class="text-xs font-mono text-slate-400 mt-1">811 Srinakarin Rd, Suan Luang, Bangkok 10250</p>
+                            </div>
+                            <div class="pt-2">
+                                <a href="https://maps.google.com/?q=Srinakarin+Road+Bangkok" target="_blank" class="btn-apex px-6 py-2.5 text-xs font-display uppercase tracking-wider inline-flex items-center gap-2">
+                                    <i class="fa-solid fa-diamond-turn-right"></i> เปิดแผนที่ Google Maps
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TECHNICAL FOOTER -->
+    <footer class="bg-obsidian-surface border-t border-white/10 text-slate-400 text-xs py-12 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 bg-apex-red flex items-center justify-center font-display font-black text-white text-base">X</div>
+                        <span class="text-lg font-display font-black text-white">CARS<span class="text-apex-red">X</span></span>
+                    </div>
+                    <p class="text-slate-400 text-xs font-light leading-relaxed">
+                        แพลตฟอร์มซื้อขายรถยนต์มือสองคัดเกรดพรีเมียมอันดับหนึ่ง พร้อมการรับประกันหลังการขาย 5 ปี หรือ 50,000 กิโลเมตร
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-mono font-bold mb-3 uppercase tracking-widest text-[11px]">เมนูด่วน (QUICK LINKS)</h4>
+                    <ul class="space-y-2 font-light">
+                        <li><a href="#inventory" class="hover:text-white transition">ค้นหารถยนต์ทั้งหมด</a></li>
+                        <li><a href="#hot-deals" class="hover:text-white transition">รถยนต์ราคาพิเศษ Hot Deals</a></li>
+                        <li><a href="javascript:void(0)" onclick="openTradeInModal()" class="hover:text-white transition">ประเมินราคาเทิร์น/ขายรถ</a></li>
+                        <li><a href="#warranty" class="hover:text-white transition">เงื่อนไขการรับประกัน 5 ปี</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-mono font-bold mb-3 uppercase tracking-widest text-[11px]">แบรนด์ยอดนิยม (MAKES)</h4>
+                    <ul class="space-y-2 font-light">
+                        <li><a href="javascript:void(0)" onclick="quickBrandFilter('Toyota')" class="hover:text-white transition">Toyota มือสองคัดสภาพ</a></li>
+                        <li><a href="javascript:void(0)" onclick="quickBrandFilter('Honda')" class="hover:text-white transition">Honda มือสองคัดสภาพ</a></li>
+                        <li><a href="javascript:void(0)" onclick="quickBrandFilter('Mazda')" class="hover:text-white transition">Mazda สภาพสวย</a></li>
+                        <li><a href="javascript:void(0)" onclick="quickBrandFilter('MG')" class="hover:text-white transition">MG Hybrid ประหยัดน้ำมัน</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-mono font-bold mb-3 uppercase tracking-widest text-[11px]">ติดต่อโชว์รูม (CONTACT)</h4>
+                    <p class="text-slate-400 mb-1">สายด่วนบริการลูกค้า:</p>
+                    <a href="tel:1532" class="text-xl font-mono font-bold text-white hover:text-apex-red transition block mb-2">1532</a>
+                    <p class="text-slate-400 font-light">811 ชั้น 2 ถนนศรีนครินทร์ แขวงสวนหลวง เขตสวนหลวง กรุงเทพฯ 10250</p>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[11px]">
+                <p>&copy; 2026 CARS27 THAILAND. ALL RIGHTS RESERVED.</p>
+                <div class="flex gap-4 text-slate-400">
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-line text-sm"></i></a>
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-youtube text-sm"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- VEHICLE DETAILS SPEC & INSPECTION DRAWER MODAL -->
+    <div id="carDetailModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-obsidian-surface border border-white/10 rounded-sm max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 relative shadow-2xl text-slate-100">
+            <button onclick="closeCarDetailModal()" class="absolute top-4 right-4 w-8 h-8 rounded-sm bg-obsidian-elevated hover:bg-slate-700 text-slate-300 flex items-center justify-center transition border border-white/10">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div id="modalCarContent">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- SELL / TRADE-IN ESTIMATOR MODAL -->
+    <div id="tradeInModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-obsidian-surface border border-white/10 rounded-sm max-w-lg w-full p-6 relative shadow-2xl text-slate-100">
+            <button onclick="closeTradeInModal()" class="absolute top-4 right-4 w-8 h-8 rounded-sm bg-obsidian-elevated hover:bg-slate-700 text-slate-300 flex items-center justify-center transition border border-white/10">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="space-y-4">
+                <div class="flex items-center gap-3 border-b border-white/10 pb-3">
+                    <div class="w-9 h-9 rounded-sm bg-apex-red/10 text-apex-red border border-apex-red/30 flex items-center justify-center text-base">
+                        <i class="fa-solid fa-handshake"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-display font-bold text-white uppercase">ประเมินราคาขาย / เทิร์นรถ (TRADE-IN)</h3>
+                        <p class="text-xs font-mono text-slate-400">กรอกข้อมูลเบื้องต้นเพื่อคำนวณราคาประเมิน</p>
+                    </div>
+                </div>
+
+                <form onsubmit="handleTradeInSubmit(event)" class="space-y-3.5 pt-1">
+                    <div>
+                        <label class="block text-xs font-mono text-slate-300 mb-1">ยี่ห้อและรุ่นรถยนต์ (BRAND & MODEL)</label>
+                        <input type="text" id="tradeModel" required placeholder="เช่น 2020 Honda Civic 1.8 EL" class="w-full bg-obsidian-base border border-white/10 rounded-sm px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-apex-red">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-mono text-slate-300 mb-1">ปีที่ผลิต (YEAR)</label>
+                            <input type="number" min="2005" max="2026" required placeholder="2019" class="w-full bg-obsidian-base border border-white/10 rounded-sm px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-apex-red">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-mono text-slate-300 mb-1">เลขไมล์ (MILEAGE KM)</label>
+                            <input type="number" step="1000" placeholder="เช่น 60000" class="w-full bg-obsidian-base border border-white/10 rounded-sm px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-apex-red">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-mono text-slate-300 mb-1">ชื่อ-นามสกุล (YOUR NAME)</label>
+                        <input type="text" required placeholder="คุณสมชาย ใจดี" class="w-full bg-obsidian-base border border-white/10 rounded-sm px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-apex-red">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-mono text-slate-300 mb-1">เบอร์โทรศัพท์ติดต่อกลับ (PHONE)</label>
+                        <input type="tel" required placeholder="081-XXX-XXXX" class="w-full bg-obsidian-base border border-white/10 rounded-sm px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-apex-red">
+                    </div>
+
+                    <div class="p-3 bg-obsidian-base rounded-sm border border-white/10 text-xs space-y-1">
+                        <div class="flex justify-between font-mono">
+                            <span class="text-slate-400">ESTIMATED RANGE:</span>
+                            <span id="estimatedValuationText" class="text-apex-gold font-bold">฿380,000 - ฿450,000</span>
+                        </div>
+                        <p class="text-[10px] text-slate-500 font-light">*ประเมินราคาจริงหลังการตรวจสภาพ 175 จุด ที่โชว์รูมศรีนครินทร์</p>
+                    </div>
+
+                    <button type="submit" class="w-full btn-apex font-display text-xs py-3 uppercase tracking-wider">
+                        ส่งข้อมูลประเมินราคา
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOAN FINANCE CALCULATOR MODAL -->
+    <div id="loanModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-obsidian-surface border border-white/10 rounded-sm max-w-md w-full p-6 relative shadow-2xl text-slate-100">
+            <button onclick="closeLoanModal()" class="absolute top-4 right-4 w-8 h-8 rounded-sm bg-obsidian-elevated hover:bg-slate-700 text-slate-300 flex items-center justify-center transition border border-white/10">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="space-y-4">
+                <div class="flex items-center gap-3 border-b border-white/10 pb-3">
+                    <div class="w-9 h-9 rounded-sm bg-blue-500/10 text-blue-400 border border-blue-500/30 flex items-center justify-center text-base">
+                        <i class="fa-solid fa-calculator"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-display font-bold text-white uppercase">คำนวณค่างวดไฟแนนซ์ (FINANCE ESTIMATOR)</h3>
+                        <p id="loanCarTitle" class="text-xs font-mono text-slate-400">Toyota Innova 2.8 Crysta V</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4 pt-1">
+                    <div>
+                        <div class="flex justify-between text-xs font-mono mb-1">
+                            <span class="text-slate-400">ราคารถยนต์ (PRICE)</span>
+                            <span id="loanPriceVal" class="text-white font-bold telemetry-num">฿559,000</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs font-mono mb-1">
+                            <span class="text-slate-400">เงินดาวน์ (DOWN PAYMENT)</span>
+                            <span id="downPercentText" class="text-apex-gold font-bold">15% (฿83,850)</span>
+                        </div>
+                        <input type="range" id="downSlider" min="0" max="50" step="5" value="15" oninput="updateLoanCalculation()" class="w-full accent-apex-red">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs font-mono mb-1">
+                            <span class="text-slate-400">ระยะเวลาผ่อน (TERM)</span>
+                            <span id="termText" class="text-white font-bold">60 เดือน (5 ปี)</span>
+                        </div>
+                        <select id="termSelect" onchange="updateLoanCalculation()" class="w-full bg-obsidian-base border border-white/10 rounded-sm px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-apex-red">
+                            <option value="48">48 เดือน (4 ปี)</option>
+                            <option value="60" selected>60 เดือน (5 ปี)</option>
+                            <option value="72">72 เดือน (6 ปี)</option>
+                            <option value="84">84 เดือน (7 ปี)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs font-mono mb-1">
+                            <span class="text-slate-400">อัตราดอกเบี้ยประมาณการณ์</span>
+                            <span class="text-emerald-400 font-bold">2.99% ต่อปี</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-sm bg-obsidian-base border border-white/10 text-center space-y-1">
+                        <span class="text-[11px] font-mono text-slate-400 uppercase">ESTIMATED MONTHLY PAYMENT</span>
+                        <div id="monthlyPaymentResult" class="text-3xl font-mono font-bold text-apex-red telemetry-num">฿9,120 / เดือน</div>
+                        <p class="text-[10px] text-slate-500 font-light">*คำนวณเบื้องต้น เงื่อนไขเป็นไปตามที่สถาบันการเงินกำหนด</p>
+                    </div>
+
+                    <button onclick="closeLoanModal(); showToast('เจ้าหน้าที่ฝ่ายจัดไฟแนนซ์จะติดต่อกลับเพื่อดูแลสินเชื่อให้คุณ');" class="w-full btn-apex font-display text-xs py-3 uppercase tracking-wider">
+                        ยื่นขออนุมัติสินเชื่อด่วน
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SAVED FAVORITES DRAWER -->
+    <div id="favDrawer" class="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-obsidian-surface border-l border-white/10 shadow-2xl p-6 transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="flex items-center justify-between pb-4 border-b border-white/10">
+            <div class="flex items-center gap-2 text-white font-display font-bold text-lg uppercase">
+                <i class="fa-solid fa-heart text-apex-red"></i>
+                <span>รถยนต์ที่บันทึกไว้ (SAVED LIST)</span>
+            </div>
+            <button onclick="toggleFavoritesDrawer()" class="w-8 h-8 rounded-sm bg-obsidian-elevated text-slate-300 flex items-center justify-center hover:bg-slate-700 border border-white/10">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div id="favDrawerItems" class="flex-1 overflow-y-auto py-4 space-y-3">
+            <!-- Dynamically populated via JS -->
+        </div>
+
+        <div class="pt-4 border-t border-white/10 space-y-2">
+            <button onclick="showToast('ส่งรายการรถที่สนใจให้เจ้าหน้าที่เรียบร้อยแล้ว')" class="w-full btn-apex font-display text-xs py-3 uppercase tracking-wider">
+                สอบถามข้อมูลรถทุกคันที่บันทึก
+            </button>
+        </div>
+    </div>
+
+    <!-- CUSTOM TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 bg-obsidian-elevated border border-apex-red/50 text-white text-xs font-sans px-4 py-3 rounded-sm shadow-2xl flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toastMsg">Notification message</span>
+    </div>
+
+    <!-- JAVASCRIPT APPLICATION DATA & TELEMETRY LOGIC -->
+    <script>
+        // FULL DATASET (Industrial Luxury Certified Fleet)
+        let CAR_DATASET = [
+            // FEATURED INVENTORY
+            {
+                id: 1,
+                make: "Toyota",
+                model: "Innova",
+                trim: "2.8 Crysta V",
+                year: 2018,
+                price: 559000,
+                wasPrice: 599000,
+                mileage: 78000,
+                bodyType: "MPV",
+                transmission: "Automatic",
+                fuel: "Diesel",
+                engine: "2.8L",
+                color: "Crystal White",
+                isFeatured: true,
+                isHotDeal: false,
+                image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80",
+                description: "รถ MPV 7 ที่นั่ง เบาะหนังปรับไฟฟ้า แอร์หลังแยก独立 เครื่องยนต์ดีเซล 2.8 เทอร์โบ ประหยัดและทนทานสูง"
+            },
+            {
+                id: 2,
+                make: "Mazda",
+                model: "Mazda 2",
+                trim: "1.3 High Connect",
+                year: 2017,
+                price: 229000,
+                wasPrice: 259000,
+                mileage: 62000,
+                bodyType: "Hatchback",
+                transmission: "Automatic",
+                fuel: "Petrol",
+                engine: "1.3L Skyactiv",
+                color: "Soul Red Crystal",
+                isFeatured: true,
+                isHotDeal: false,
+                image: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80",
+                description: "แฮตช์แบ็ก 5 ประตูสุดสปอร์ต เทคโนโลยี Skyactiv-G ประหยัดน้ำมันสูงสุด 23.3 กม./ลิตร หน้าจอ MZD Connect"
+            },
+            {
+                id: 3,
+                make: "MG",
+                model: "VS HEV",
+                trim: "1.5 X",
+                year: 2024,
+                price: 479000,
+                wasPrice: 529000,
+                mileage: 12000,
+                bodyType: "SUV",
+                transmission: "E-CVT",
+                fuel: "Hybrid (HEV)",
+                engine: "1.5L Hybrid",
+                color: "Dual Tone Silver",
+                isFeatured: true,
+                isHotDeal: false,
+                image: "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=800&q=80",
+                description: "SUV ไฮบริดไมล์น้อยมาก 12,000 กม. หน้าจอยาว Dual Widescreen หลังคา Panoramic Sunroof สภาพโชว์รูม"
+            },
+            {
+                id: 4,
+                make: "Toyota",
+                model: "Vios",
+                trim: "1.5 Mid",
+                year: 2019,
+                price: 319000,
+                wasPrice: 349000,
+                mileage: 54000,
+                bodyType: "Sedan",
+                transmission: "CVT Auto",
+                fuel: "Petrol",
+                engine: "1.5L Dual VVT-i",
+                color: "Silver Metallic",
+                isFeatured: true,
+                isHotDeal: false,
+                image: "https://images.unsplash.com/photo-1590362891991-f776e747a588?auto=format&fit=crop&w=800&q=80",
+                description: "ซีดานยอดนิยม ดูแลรักษาง่าย ออปชันครบ ไฟหน้า projector กล้องมองหลัง ระบบควบคุมการทรงตัว VSC"
+            },
+            {
+                id: 5,
+                make: "Honda",
+                model: "HR-V",
+                trim: "1.8 EL",
+                year: 2015,
+                price: 369000,
+                wasPrice: 399000,
+                mileage: 91000,
+                bodyType: "SUV",
+                transmission: "CVT Auto",
+                fuel: "Petrol (E85)",
+                engine: "1.8L i-VTEC",
+                color: "Crystal Black",
+                isFeatured: true,
+                isHotDeal: false,
+                image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80",
+                description: "ครอสโอเวอร์ยอดฮิต หลังคาพาโนรามิครูฟ เบรกมือไฟฟ้า Auto Brake Hold เบาะนั่ง Ultra Seat ปรับได้หลายรูปแบบ"
+            },
+            {
+                id: 6,
+                make: "Toyota",
+                model: "Veloz",
+                trim: "1.5 Smart",
+                year: 2023,
+                price: 539000,
+                wasPrice: 579000,
+                mileage: 23000,
+                bodyType: "MPV",
+                transmission: "CVT Auto",
+                fuel: "Petrol",
+                engine: "1.5L Dual VVT-i",
+                color: "White Pearl",
+                isFeatured: true,
+                isHotDeal: false,
+                image: "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=800&q=80",
+                description: "รถครอบครัว 7 ที่นั่งโฉมปัจจุบัน มาพร้อม Toyota Safety Sense แท่นชาร์จไร้สาย Wireless Charger สภาพใหม่กริ๊บ"
+            },
+
+            // HOT DEALS
+            {
+                id: 7,
+                make: "Toyota",
+                model: "Vellfire",
+                trim: "2.5 Golden Eyes",
+                year: 2019,
+                price: 1389000,
+                wasPrice: 1489000,
+                mileage: 68000,
+                bodyType: "MPV",
+                transmission: "CVT Auto",
+                fuel: "Petrol",
+                engine: "2.5L 4-Cyl",
+                color: "Burning Black",
+                isFeatured: false,
+                isHotDeal: true,
+                image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80",
+                description: "VIP MPV หรูหรา เบาะหัวหมอนมิกกี้เมาส์ปรับไฟฟ้า ประตูสไลด์ไฟฟ้าซ้าย-ขวา เครื่องเสียงครบครัน สภาพสวยสมบูรณ์"
+            },
+            {
+                id: 8,
+                make: "Honda",
+                model: "HR-V",
+                trim: "1.5 e:HEV EL",
+                year: 2022,
+                price: 599000,
+                wasPrice: 649000,
+                mileage: 35000,
+                bodyType: "SUV",
+                transmission: "E-CVT",
+                fuel: "Hybrid (HEV)",
+                engine: "1.5L e:HEV",
+                color: "Platinum White",
+                isFeatured: false,
+                isHotDeal: true,
+                image: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=800&q=80",
+                description: "SUV ไฮบริดรุ่นใหม่ล่าสุด ระบบความปลอดภัย Honda SENSING ฝาท้ายไฟฟ้าพร้อมระบบ Walk Away Close"
+            },
+            {
+                id: 9,
+                make: "Toyota",
+                model: "Commuter",
+                trim: "2.8 High Roof Van",
+                year: 2019,
+                price: 999000,
+                wasPrice: 1050000,
+                mileage: 82000,
+                bodyType: "Van",
+                transmission: "Automatic",
+                fuel: "Diesel",
+                engine: "2.8L GD Turbo",
+                color: "Silver Metallic",
+                isFeatured: false,
+                isHotDeal: true,
+                image: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=800&q=80",
+                description: "ตู้ VIP หลังคาสูง 15 ที่นั่ง เครื่องยนต์ 2.8 ดีเซลเทอร์โบ แอร์หลังเย็นฉ่ำ เหมาะสำหรับธุรกิจหรือครอบครัวใหญ่"
+            },
+            {
+                id: 10,
+                make: "Toyota",
+                model: "HiAce",
+                trim: "2.8 Eco Panel Van",
+                year: 2019,
+                price: 679000,
+                wasPrice: 719000,
+                mileage: 75000,
+                bodyType: "Van",
+                transmission: "Manual",
+                fuel: "Diesel",
+                engine: "2.8L Turbo",
+                color: "White",
+                isFeatured: false,
+                isHotDeal: true,
+                image: "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=800&q=80",
+                description: "ตู้บรรทุกสินค้าและพาณิชย์ พื้นกระบะปูอย่างดี เครื่องยนต์ทนทาน ประหยัดน้ำมัน ดูแลรักษาง่าย"
+            },
+            {
+                id: 11,
+                make: "Honda",
+                model: "Accord",
+                trim: "1.5 Turbo EL",
+                year: 2019,
+                price: 619000,
+                wasPrice: 669000,
+                mileage: 59000,
+                bodyType: "Sedan",
+                transmission: "CVT Auto",
+                fuel: "Petrol",
+                engine: "1.5L VTEC Turbo",
+                color: "Modern Steel",
+                isFeatured: false,
+                isHotDeal: true,
+                image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=800&q=80",
+                description: "ซีดานหรูสมรรถนะสูง 190 แรงม้า พวงมาลัยมัลติฟังก์ชั่น กล้องแสดงภาพมุมอับสายตา Honda LaneWatch"
+            },
+            {
+                id: 12,
+                make: "Mercedes-Benz",
+                model: "E350",
+                trim: "2.0 e Exclusive",
+                year: 2019,
+                price: 699000,
+                wasPrice: 759000,
+                mileage: 51000,
+                bodyType: "Sedan",
+                transmission: "9G-TRONIC",
+                fuel: "Plug-in Hybrid",
+                engine: "2.0L EQ Power",
+                color: "Obsidian Black",
+                isFeatured: false,
+                isHotDeal: true,
+                image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=800&q=80",
+                description: "ซีดานหรูเยอรมัน Plug-in Hybrid ช่วงล่างถุงลม AIRBODY CONTROL หน้าจอ Widescreen Cockpit คู่"
+            }
+        ];
+
+        // STATE
+        let favorites = [];
+        let currentCalculatedCar = null;
+
+        // INIT
+        window.addEventListener('DOMContentLoaded', loadCarInventory);
+
+        async function loadCarInventory() {
+            const sourceStatus = document.getElementById('inventorySourceStatus');
+
+            try {
+                const response = await fetch('/api/cars');
+                if (!response.ok) {
+                    throw new Error(`Car API returned HTTP ${response.status}`);
+                }
+
+                const cars = await response.json();
+                if (!Array.isArray(cars)) {
+                    throw new Error('Car API response must be an array.');
+                }
+
+                CAR_DATASET = cars.map(normalizeApiCar);
+                sourceStatus.textContent = 'เชื่อมต่อรายการรถจากฐานข้อมูลแล้ว';
+                sourceStatus.style.color = '#52705d';
+            } catch (error) {
+                console.error('Unable to load cars from API; showing sample inventory:', error);
+                sourceStatus.textContent = 'API ไม่พร้อม - กำลังแสดงข้อมูลตัวอย่าง';
+                sourceStatus.style.color = '#b9122d';
+            }
+
+            addMissingFilterOptions('makeFilter', CAR_DATASET.map(car => car.make));
+            addMissingFilterOptions('bodyFilter', CAR_DATASET.map(car => car.bodyType));
+            renderFeaturedGrid(CAR_DATASET.filter(car => car.isFeatured));
+            renderHotDealsGrid(CAR_DATASET.filter(car => car.isHotDeal));
+            updateFavoritesUI();
+        }
+
+        function addMissingFilterOptions(selectId, values) {
+            const select = document.getElementById(selectId);
+            const selectedValue = select.value;
+            const existingValues = new Set(Array.from(select.options, option => option.value));
+
+            [...new Set(values.filter(Boolean))]
+                .filter(value => !existingValues.has(value))
+                .sort((a, b) => a.localeCompare(b))
+                .forEach(value => select.add(new Option(value, value)));
+
+            select.value = existingValues.has(selectedValue) || values.includes(selectedValue)
+                ? selectedValue
+                : 'ALL';
+        }
+
+        function normalizeApiCar(car) {
+            const imageUrl = car.image ?? car.image_url;
+            const safeImageUrl = typeof imageUrl === 'string' &&
+                (/^https?:\/\/\S+$/i.test(imageUrl) || imageUrl.startsWith('/uploads/'))
+                ? imageUrl
+                : 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=800&q=80';
+            const images = Array.isArray(car.images)
+                ? car.images.filter(image => typeof image === 'string' &&
+                    (/^https?:\/\/\S+$/i.test(image) || image.startsWith('/uploads/')))
+                : [];
+            if (!images.includes(safeImageUrl)) images.unshift(safeImageUrl);
+            const isEnabled = value => value === true || value === 1 || value === '1';
+
+            return {
+                ...car,
+                id: Number(car.id),
+                make: String(car.make ?? car.brand ?? ''),
+                model: String(car.model ?? ''),
+                trim: String(car.trim ?? ''),
+                year: Number(car.year ?? car.manufacture_year),
+                price: Number(car.price),
+                wasPrice: car.wasPrice == null && car.was_price == null
+                    ? null
+                    : Number(car.wasPrice ?? car.was_price),
+                mileage: Number(car.mileage),
+                bodyType: String(car.bodyType ?? car.body_type ?? 'Sedan'),
+                transmission: String(car.transmission ?? 'ไม่ระบุ'),
+                fuel: String(car.fuel ?? 'ไม่ระบุ'),
+                engine: String(car.engine ?? ''),
+                color: String(car.color ?? 'ไม่ระบุ'),
+                isFeatured: car.isFeatured === undefined && car.is_featured === undefined
+                    ? true
+                    : isEnabled(car.isFeatured ?? car.is_featured),
+                isHotDeal: isEnabled(car.isHotDeal ?? car.is_hot_deal),
+                warrantyYears: Number(car.warrantyYears ?? car.warranty_years ?? 5),
+                image: safeImageUrl,
+                images: [...new Set(images)],
+                description: String(car.description ?? '')
+            };
+        }
+
+        function escapeHTML(value) {
+            return String(value).replace(/[&<>"']/g, character => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[character]);
+        }
+
+        // RENDER FEATURED GRID
+        function renderFeaturedGrid(cars) {
+            const container = document.getElementById('featuredGrid');
+            document.getElementById('inventoryCount').innerText = cars.length;
+
+            if (cars.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-16 text-center text-slate-500 font-mono text-xs border border-white/10 bg-obsidian-surface">
+                        <i class="fa-solid fa-car-side text-3xl mb-2 text-slate-600"></i>
+                        <p>ไม่พบรายการรถยนต์ที่ตรงกับเงื่อนไขการค้นหา</p>
+                        <button onclick="resetFilters()" class="mt-3 text-xs bg-apex-red text-white px-4 py-2 font-display uppercase">รีเซ็ตตัวกรอง</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = cars.map(car => createCarCardHTML(car)).join('');
+        }
+
+        // RENDER HOT DEALS GRID
+        function renderHotDealsGrid(cars) {
+            const container = document.getElementById('hotDealsGrid');
+            container.innerHTML = cars.map(car => createCarCardHTML(car, true)).join('');
+        }
+
+        // TELEMETRY CARD BUILDER
+        function createCarCardHTML(car, isHot = false) {
+            const isFav = favorites.includes(car.id);
+            const monthlyEst = Math.round((car.price * 0.85 * 1.15) / 60).toLocaleString();
+
+            return `
+                <article class="telemetry-card flex flex-col group">
+                    <div class="img-mask-16-10">
+                        <img src="${escapeHTML(car.image)}" alt="${escapeHTML(car.make)} ${escapeHTML(car.model)}">
+                        <div class="img-vignette"></div>
+
+                        <!-- Top Left Badges -->
+                        <div class="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10">
+                            ${isHot ? `<span class="bg-apex-red text-white text-[9px] font-mono font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider"><i class="fa-solid fa-bolt"></i> HOT DEAL</span>` : ''}
+                            <span class="gold-certified-badge"><i class="fa-solid fa-shield-halved"></i> CARS27 5Y/50k KM</span>
+                        </div>
+
+                        <!-- Favorite Heart Button -->
+                        <button onclick="toggleFavorite(${car.id})" class="absolute top-2.5 right-2.5 w-7 h-7 rounded-sm bg-obsidian-base/80 backdrop-blur-md text-white border border-white/10 flex items-center justify-center hover:bg-apex-red transition z-10">
+                            <i class="${isFav ? 'fa-solid text-apex-red' : 'fa-regular'} fa-heart text-xs"></i>
+                        </button>
+
+                        <div class="absolute bottom-2.5 right-2.5 bg-obsidian-base/90 border border-white/10 text-slate-300 text-[10px] font-mono px-2 py-0.5">
+                            <i class="fa-solid fa-gauge text-apex-red mr-1"></i> ${Number(car.mileage).toLocaleString()} KM
+                        </div>
+                    </div>
+
+                    <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                        <div>
+                            <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-0.5">
+                                <span>${escapeHTML(car.year)} ${escapeHTML(car.make.toUpperCase())}</span>
+                                <span class="bg-white/5 border border-white/10 px-1.5 py-0.2 text-[9px] text-slate-300">${escapeHTML(car.bodyType)}</span>
+                            </div>
+                            <h3 class="text-base font-display font-bold text-white leading-snug group-hover:text-apex-red transition uppercase">${escapeHTML(car.model)} ${escapeHTML(car.trim)}</h3>
+                            
+                            <!-- Telemetry Specs Pills -->
+                            <div class="grid grid-cols-3 gap-1 text-[10px] font-mono text-slate-400 mt-2 py-2 border-y border-white/5">
+                                <div><span class="text-slate-600 block">ENGINE</span>${escapeHTML(car.engine)}</div>
+                                <div><span class="text-slate-600 block">GEAR</span>${escapeHTML(car.transmission.split(' ')[0])}</div>
+                                <div><span class="text-slate-600 block">FUEL</span>${escapeHTML(car.fuel.split(' ')[0])}</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 pt-1">
+                            <div class="flex items-baseline justify-between">
+                                <div>
+                                    ${car.wasPrice ? `<span class="text-[11px] font-mono text-slate-500 line-through mr-1">฿${Number(car.wasPrice).toLocaleString()}</span>` : ''}
+                                    <span class="listing-price text-xl font-mono font-bold text-white telemetry-num">฿${Number(car.price).toLocaleString()}</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="monthly-label text-[9px] font-mono text-slate-400 block">EST. MONTHLY</span>
+                                    <span class="text-xs font-mono font-bold text-emerald-400 telemetry-num">฿${monthlyEst}/เดือน</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="openCarDetailModal(${car.id})" class="btn-slate-outline text-xs font-display py-2 uppercase tracking-wider">
+                                    ดูรายละเอียด
+                                </button>
+                                <button onclick="openLoanModal(${car.id})" class="btn-slate-outline text-xs font-mono py-2 text-apex-red border-apex-red/30 hover:bg-apex-red hover:text-white transition flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-calculator text-[10px]"></i> คำนวณค่างวด
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        // FILTER LOGIC
+        function filterCars() {
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            const makeVal = document.getElementById('makeFilter').value;
+            const bodyVal = document.getElementById('bodyFilter').value;
+            const priceVal = document.getElementById('priceFilter').value;
+            const sortVal = document.getElementById('sortFilter').value;
+
+            let filtered = CAR_DATASET.filter(car => {
+                const matchesSearch = car.make.toLowerCase().includes(searchVal) || 
+                                      car.model.toLowerCase().includes(searchVal) || 
+                                      car.trim.toLowerCase().includes(searchVal);
+                const matchesMake = makeVal === 'ALL' || car.make === makeVal;
+                const matchesBody = bodyVal === 'ALL' || car.bodyType === bodyVal;
+                const matchesPrice = priceVal === 'ALL' || car.price <= parseInt(priceVal);
+
+                return matchesSearch && matchesMake && matchesBody && matchesPrice;
+            });
+
+            if (sortVal === 'price-asc') filtered.sort((a,b) => a.price - b.price);
+            if (sortVal === 'price-desc') filtered.sort((a,b) => b.price - a.price);
+            if (sortVal === 'year-desc') filtered.sort((a,b) => b.year - a.year);
+            if (sortVal === 'mileage-asc') filtered.sort((a,b) => a.mileage - b.mileage);
+
+            renderFeaturedGrid(filtered);
+            document.getElementById('activeFilterBadge').innerText = `${filtered.length} VEHICLES FOUND`;
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('makeFilter').value = 'ALL';
+            document.getElementById('bodyFilter').value = 'ALL';
+            document.getElementById('priceFilter').value = 'ALL';
+            document.getElementById('sortFilter').value = 'recommended';
+            filterCars();
+        }
+
+        function quickBrandFilter(brandName) {
+            document.getElementById('makeFilter').value = brandName;
+            filterCars();
+            document.getElementById('search-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // VEHICLE SPEC & INSPECTION DRAWER MODAL
+        function openCarDetailModal(carId) {
+            const car = CAR_DATASET.find(c => c.id === carId);
+            if (!car) return;
+
+            const modalContent = document.getElementById('modalCarContent');
+            const monthlyEst = Math.round((car.price * 0.85 * 1.15) / 60).toLocaleString();
+
+            modalContent.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Left Photo & Master Inspection Sheet -->
+                    <div class="lg:col-span-7 space-y-4">
+                        <div id="carGalleryStage" class="img-mask-16-10 rounded-sm border border-white/10 touch-pan-y"
+                            onpointerdown="startCarGallerySwipe(event)"
+                            onpointerup="handleCarGallerySwipe(event, ${car.id})"
+                            onpointercancel="cancelCarGallerySwipe()">
+                            <img id="carGalleryMainImage" src="${escapeHTML(car.images[0])}" data-image-index="0" alt="${escapeHTML(car.make)} ${escapeHTML(car.model)}" class="w-full h-full object-cover">
+                            <div class="img-vignette"></div>
+                            <div class="absolute top-3 left-3 gold-certified-badge">
+                                <i class="fa-solid fa-shield-halved"></i> CARS27 5-YEAR CERTIFIED WARRANTY
+                            </div>
+                            ${car.images.length > 1 ? `
+                                <button type="button" onclick="changeCarGalleryImage(${car.id}, -1)" aria-label="ดูรูปรถก่อนหน้า" class="absolute left-3 top-1/2 -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/65 text-white hover:bg-black/85">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </button>
+                                <button type="button" onclick="changeCarGalleryImage(${car.id}, 1)" aria-label="ดูรูปรถถัดไป" class="absolute right-3 top-1/2 -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/65 text-white hover:bg-black/85">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </button>
+                                <span id="carGallerySlideCount" class="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 rounded-full bg-black/70 px-3 py-1 text-[11px] font-mono text-white">1 / ${car.images.length}</span>
+                            ` : ''}
+                        </div>
+                        ${car.images.length > 1 ? `
+                            <div>
+                                <div class="flex items-center justify-between mb-2 text-[10px] font-mono text-slate-400">
+                                    <span>รูปภาพรถเพิ่มเติม</span>
+                                    <span id="carGalleryImageCount">1 / ${car.images.length}</span>
+                                </div>
+                                <div class="flex gap-2 overflow-x-auto pb-2" aria-label="เลื่อนเพื่อดูรูปภาพรถเพิ่มเติม">
+                                    ${car.images.map((image, index) => `
+                                        <button type="button" onclick="showCarGalleryImage(${car.id}, ${index})" aria-label="ดูรูปรถภาพที่ ${index + 1}" aria-pressed="${index === 0}" class="car-gallery-thumbnail shrink-0 w-24 h-16 overflow-hidden rounded-sm border-2 ${index === 0 ? 'border-apex-red' : 'border-white/10'}">
+                                            <img src="${escapeHTML(image)}" alt="" class="w-full h-full object-cover">
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- 175-Point Master Diagnostic Checklist -->
+                        <div class="p-4 bg-obsidian-base border border-white/10 space-y-3">
+                            <div class="flex justify-between items-center text-xs border-b border-white/10 pb-2">
+                                <span class="font-mono font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-microchip text-emerald-400"></i> ผลการตรวจสภาพ 175 จุด (175-POINT MASTER CHECK)
+                                </span>
+                                <span class="text-emerald-400 font-mono font-bold bg-emerald-500/10 px-2 py-0.5 border border-emerald-500/30">PASS 99.6%</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono text-slate-300">
+                                <div class="bg-obsidian-surface p-2 border border-white/5 text-center"><span class="text-slate-500 block text-[9px]">ENGINE</span>ผ่าน (100%)</div>
+                                <div class="bg-obsidian-surface p-2 border border-white/5 text-center"><span class="text-slate-500 block text-[9px]">GEARBOX</span>ผ่าน (100%)</div>
+                                <div class="bg-obsidian-surface p-2 border border-white/5 text-center"><span class="text-slate-500 block text-[9px]">STRUCTURE</span>เดิม 100%</div>
+                                <div class="bg-obsidian-surface p-2 border border-white/5 text-center"><span class="text-slate-500 block text-[9px]">FLOOD CHECK</span>ไม่มี (0%)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Specs & Action Panel -->
+                    <div class="lg:col-span-5 space-y-4">
+                        <div>
+                            <span class="text-xs font-mono text-slate-400 uppercase tracking-widest">${escapeHTML(car.year)} ${escapeHTML(car.make)}</span>
+                            <h2 class="text-2xl font-display font-black text-white uppercase leading-tight">${escapeHTML(car.model)} ${escapeHTML(car.trim)}</h2>
+                            <p class="text-xs text-slate-400 mt-2 font-light leading-relaxed">${escapeHTML(car.description)}</p>
+                        </div>
+
+                        <div class="p-4 bg-obsidian-base border border-white/10 space-y-2">
+                            <div class="flex justify-between items-baseline font-mono">
+                                <span class="text-xs text-slate-400">ราคาเงินสด (CASH PRICE):</span>
+                                <span class="text-2xl font-bold text-white telemetry-num">฿${Number(car.price).toLocaleString()}</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs font-mono pt-2 border-t border-white/10">
+                                <span class="text-slate-400">ประมาณการค่างวด:</span>
+                                <span class="text-emerald-400 font-bold text-sm">฿${monthlyEst} / เดือน</span>
+                            </div>
+                        </div>
+
+                        <!-- Spec Sheet Grid -->
+                        <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                            <div class="bg-obsidian-base p-2.5 border border-white/5"><span class="text-slate-500 block text-[10px]">MILEAGE</span><strong class="text-white">${Number(car.mileage).toLocaleString()} KM</strong></div>
+                            <div class="bg-obsidian-base p-2.5 border border-white/5"><span class="text-slate-500 block text-[10px]">TRANSMISSION</span><strong class="text-white">${escapeHTML(car.transmission)}</strong></div>
+                            <div class="bg-obsidian-base p-2.5 border border-white/5"><span class="text-slate-500 block text-[10px]">FUEL TYPE</span><strong class="text-white">${escapeHTML(car.fuel)}</strong></div>
+                            <div class="bg-obsidian-base p-2.5 border border-white/5"><span class="text-slate-500 block text-[10px]">EXTERIOR COLOR</span><strong class="text-white">${escapeHTML(car.color)}</strong></div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="space-y-2 pt-2">
+                            <button onclick="bookTestDrive(${escapeHTML(JSON.stringify(`${car.make} ${car.model}`))})" class="w-full btn-apex font-display text-xs py-3 uppercase tracking-wider flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-calendar-check"></i> นัดหมายทดลองขับที่สาขา ศรีนครินทร์
+                            </button>
+                            <button onclick="closeCarDetailModal(); openLoanModal(${car.id});" class="w-full btn-slate-outline font-mono text-xs py-2.5 uppercase">
+                                คำนวณยอดจัดไฟแนนซ์คันนี้
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const modal = document.getElementById('carDetailModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeCarDetailModal() {
+            const modal = document.getElementById('carDetailModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function showCarGalleryImage(carId, imageIndex) {
+            const car = CAR_DATASET.find(item => item.id === carId);
+            if (!car || !Number.isInteger(imageIndex) || !car.images[imageIndex]) return;
+
+            const mainImage = document.getElementById('carGalleryMainImage');
+            if (!mainImage) return;
+            mainImage.src = car.images[imageIndex];
+            const imageCount = document.getElementById('carGalleryImageCount');
+            if (imageCount) imageCount.textContent = `${imageIndex + 1} / ${car.images.length}`;
+            document.querySelectorAll('.car-gallery-thumbnail').forEach((thumbnail, index) => {
+                const isSelected = index === imageIndex;
+                thumbnail.classList.toggle('border-apex-red', isSelected);
+                thumbnail.classList.toggle('border-white/10', !isSelected);
+                thumbnail.setAttribute('aria-pressed', String(isSelected));
+                if (isSelected) thumbnail.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+            });
+            const counter = document.getElementById('carGallerySlideCount');
+            if (counter) counter.textContent = `${imageIndex + 1} / ${car.images.length}`;
+            mainImage.dataset.imageIndex = String(imageIndex);
+        }
+
+        function changeCarGalleryImage(carId, direction) {
+            const car = CAR_DATASET.find(item => item.id === carId);
+            const mainImage = document.getElementById('carGalleryMainImage');
+            if (!car || !mainImage || car.images.length < 2) return;
+            const currentIndex = Number(mainImage.dataset.imageIndex || 0);
+            const nextIndex = (currentIndex + direction + car.images.length) % car.images.length;
+            showCarGalleryImage(carId, nextIndex);
+        }
+
+        let carGalleryPointerStart = null;
+        function startCarGallerySwipe(event) {
+            if (event.pointerType === 'touch') {
+                carGalleryPointerStart = { x: event.clientX, y: event.clientY };
+            }
+        }
+
+        function handleCarGallerySwipe(event, carId) {
+            if (!carGalleryPointerStart || event.pointerType !== 'touch') return;
+            const deltaX = event.clientX - carGalleryPointerStart.x;
+            const deltaY = event.clientY - carGalleryPointerStart.y;
+            carGalleryPointerStart = null;
+            if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY)) {
+                changeCarGalleryImage(carId, deltaX < 0 ? 1 : -1);
+            }
+        }
+
+        function cancelCarGallerySwipe() {
+            carGalleryPointerStart = null;
+        }
+
+        // LOAN CALCULATOR MODAL LOGIC
+        function openLoanModal(carId) {
+            currentCalculatedCar = CAR_DATASET.find(c => c.id === carId) || CAR_DATASET[0];
+            document.getElementById('loanCarTitle').innerText = `${currentCalculatedCar.year} ${currentCalculatedCar.make} ${currentCalculatedCar.model}`;
+            document.getElementById('loanPriceVal').innerText = `฿${currentCalculatedCar.price.toLocaleString()}`;
+            
+            updateLoanCalculation();
+
+            const modal = document.getElementById('loanModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeLoanModal() {
+            const modal = document.getElementById('loanModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function updateLoanCalculation() {
+            if (!currentCalculatedCar) return;
+            const downPercent = parseInt(document.getElementById('downSlider').value);
+            const months = parseInt(document.getElementById('termSelect').value);
+
+            const price = currentCalculatedCar.price;
+            const downAmount = (price * downPercent) / 100;
+            const loanPrincipal = price - downAmount;
+            
+            const annualInterest = 0.0299;
+            const years = months / 12;
+            const totalInterest = loanPrincipal * annualInterest * years;
+            const monthlyPayment = Math.round((loanPrincipal + totalInterest) / months);
+
+            document.getElementById('downPercentText').innerText = `${downPercent}% (฿${Math.round(downAmount).toLocaleString()})`;
+            document.getElementById('termText').innerText = `${months} เดือน (${years} ปี)`;
+            document.getElementById('monthlyPaymentResult').innerText = `฿${monthlyPayment.toLocaleString()} / เดือน`;
+        }
+
+        // TRADE-IN MODAL LOGIC
+        function openTradeInModal() {
+            const modal = document.getElementById('tradeInModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeTradeInModal() {
+            const modal = document.getElementById('tradeInModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function handleTradeInSubmit(e) {
+            e.preventDefault();
+            closeTradeInModal();
+            showToast("เจ้าหน้าที่ประเมินราคารถ CARS27 จะติดต่อกลับหาคุณภายใน 30 นาที");
+        }
+
+        // FAVORITES SYSTEM
+        function toggleFavorite(carId) {
+            const index = favorites.indexOf(carId);
+            if (index > -1) {
+                favorites.splice(index, 1);
+                showToast("ลบรถออกจากรายการที่บันทึกแล้ว");
+            } else {
+                favorites.push(carId);
+                showToast("บันทึกรถยนต์ลงในรายการโปรดแล้ว!");
+            }
+            updateFavoritesUI();
+            filterCars();
+            renderHotDealsGrid(CAR_DATASET.filter(c => c.isHotDeal));
+        }
+
+        function updateFavoritesUI() {
+            const badge = document.getElementById('favCount');
+            if (favorites.length > 0) {
+                badge.innerText = favorites.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            const drawerItems = document.getElementById('favDrawerItems');
+            if (favorites.length === 0) {
+                drawerItems.innerHTML = `
+                    <div class="text-center text-slate-500 font-mono py-10 text-xs">
+                        <i class="fa-regular fa-heart text-3xl mb-2"></i>
+                        <p>ยังไม่มีรถยนต์ที่บันทึกไว้</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const savedCars = CAR_DATASET.filter(c => favorites.includes(c.id));
+            drawerItems.innerHTML = savedCars.map(car => `
+                <div class="flex items-center gap-3 p-3 bg-obsidian-base border border-white/10">
+                    <img src="${escapeHTML(car.image)}" alt="${escapeHTML(car.make)} ${escapeHTML(car.model)}" class="w-16 h-12 object-cover rounded-sm">
+                    <div class="flex-1">
+                        <h4 class="text-xs font-display font-bold text-white uppercase">${escapeHTML(car.make)} ${escapeHTML(car.model)}</h4>
+                        <span class="text-xs font-mono text-apex-gold font-bold">฿${Number(car.price).toLocaleString()}</span>
+                    </div>
+                    <button onclick="toggleFavorite(${car.id})" class="text-slate-500 hover:text-apex-red p-2">
+                        <i class="fa-solid fa-trash text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function toggleFavoritesDrawer() {
+            const drawer = document.getElementById('favDrawer');
+            drawer.classList.toggle('translate-x-full');
+        }
+
+        // BOOK TEST DRIVE
+        function bookTestDrive(carName) {
+            closeCarDetailModal();
+            showToast(`ยืนยันการนัดหมายทดลองขับ ${carName} เรียบร้อยแล้ว`);
+        }
+
+        // CUSTOM TOAST NOTIFICATION
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
