@@ -14,6 +14,7 @@ if (fs.existsSync(envFile)) {
 const app = express();
 const uploadDirectory = path.join(__dirname, 'uploads');
 const unlinkFile = promisify(fs.unlink);
+const maxCarImages = 20;
 const port = Number(process.env.PORT || 3000);
 const database = mysql.createPool({
     host: process.env.DB_HOST || '127.0.0.1',
@@ -67,7 +68,7 @@ const upload = multer({
             callback(null, `${crypto.randomUUID()}${imageExtensions.get(file.mimetype)}`);
         }
     }),
-    limits: { fileSize: 5 * 1024 * 1024, files: 10 },
+    limits: { fileSize: 5 * 1024 * 1024, files: maxCarImages },
     fileFilter: (req, file, callback) => {
         if (!imageExtensions.has(file.mimetype)) {
             return callback(new Error('รองรับเฉพาะไฟล์ JPG, PNG และ WebP'));
@@ -233,10 +234,13 @@ function carValues(car) {
     ];
 }
 
-app.post('/api/cars', requireCarAdmin, upload.array('images', 10), async (req, res) => {
+app.post('/api/cars', requireCarAdmin, upload.array('images', maxCarImages), async (req, res) => {
     const uploadedFiles = req.files || [];
     const car = validateCarPayload(req.body || {}, uploadedFiles, true);
     if (!car) {
+        await Promise.all(uploadedFiles.map(file => unlinkFile(file.path).catch(error => {
+            console.error('Unable to remove invalid uploaded car image:', error);
+        })));
         return res.status(400).json({ error: 'ข้อมูลรถไม่ถูกต้อง กรุณาตรวจสอบช่องที่จำเป็นและรูปแบบข้อมูล' });
     }
 
@@ -281,7 +285,7 @@ app.post('/api/cars', requireCarAdmin, upload.array('images', 10), async (req, r
     });
 });
 
-app.put('/api/cars/:id', requireCarAdmin, upload.array('images', 10), async (req, res) => {
+app.put('/api/cars/:id', requireCarAdmin, upload.array('images', maxCarImages), async (req, res) => {
     const carId = Number(req.params.id);
     if (!Number.isInteger(carId) || carId <= 0) {
         return res.status(400).json({ error: 'รหัสรถไม่ถูกต้อง' });
@@ -290,6 +294,9 @@ app.put('/api/cars/:id', requireCarAdmin, upload.array('images', 10), async (req
     const uploadedFiles = req.files || [];
     const car = validateCarPayload(req.body || {}, uploadedFiles, false);
     if (!car) {
+        await Promise.all(uploadedFiles.map(file => unlinkFile(file.path).catch(error => {
+            console.error('Unable to remove invalid uploaded car image:', error);
+        })));
         return res.status(400).json({ error: 'ข้อมูลรถไม่ถูกต้อง กรุณาตรวจสอบช่องที่จำเป็นและรูปแบบข้อมูล' });
     }
 
@@ -297,13 +304,31 @@ app.put('/api/cars/:id', requireCarAdmin, upload.array('images', 10), async (req
     try {
         await connection.beginTransaction();
         const [existingCars] = await connection.execute(
-            'SELECT id FROM cars WHERE id = ? FOR UPDATE',
+            'SELECT id, image_url AS image FROM cars WHERE id = ? FOR UPDATE',
             [carId]
         );
         if (!existingCars.length) {
             await connection.rollback();
             await Promise.all(uploadedFiles.map(file => unlinkFile(file.path)));
             return res.status(404).json({ error: 'ไม่พบรถที่ต้องการแก้ไข' });
+        }
+
+        if (uploadedFiles.length) {
+            const [imageCounts] = await connection.execute(
+                'SELECT COUNT(*) AS imageCount, COALESCE(MAX(sort_order), -1) AS lastOrder FROM car_images WHERE car_id = ?',
+                [carId]
+            );
+            const existingImageCount = Number(imageCounts[0].imageCount) ||
+                (existingCars[0].image ? 1 : 0);
+            if (existingImageCount + uploadedFiles.length > maxCarImages) {
+                await connection.rollback();
+                await Promise.all(uploadedFiles.map(file => unlinkFile(file.path).catch(error => {
+                    console.error('Unable to remove excess uploaded car image:', error);
+                })));
+                return res.status(400).json({
+                    error: `รถหนึ่งคันเพิ่มรูปได้ไม่เกิน ${maxCarImages} รูป`
+                });
+            }
         }
 
         const updates = carValues(car);
@@ -481,7 +506,7 @@ app.post('/api/leads', async (req, res) => {
     res.status(201).json({ message: 'บันทึกข้อมูลติดต่อเรียบร้อยแล้ว', lead_id: result.insertId });
 });
 
-app.post('/api/cars/:car_id/images', requireCarAdmin, upload.array('images', 10), async (req, res) => {
+app.post('/api/cars/:car_id/images', requireCarAdmin, upload.array('images', maxCarImages), async (req, res) => {
     const carId = Number(req.params.car_id);
     if (!Number.isInteger(carId) || carId <= 0) {
         return res.status(400).json({ error: 'รหัสรถไม่ถูกต้อง' });
@@ -490,19 +515,53 @@ app.post('/api/cars/:car_id/images', requireCarAdmin, upload.array('images', 10)
         return res.status(400).json({ error: 'กรุณาแนบไฟล์รูปภาพ' });
     }
 
-    const [existingImages] = await database.execute(
-        'SELECT COALESCE(MAX(sort_order), -1) AS lastOrder FROM car_images WHERE car_id = ?',
-        [carId]
-    );
-    const firstOrder = Number(existingImages[0].lastOrder) + 1;
-    const imageRecords = req.files.map((file, index) => [
-        carId, `/uploads/${file.filename}`, firstOrder + index
-    ]);
-    await database.query(
-        'INSERT INTO car_images (car_id, image_url, sort_order) VALUES ?',
-        [imageRecords]
-    );
-    await database.execute('UPDATE cars SET image_url = ? WHERE id = ?', [imageRecords[0][1], carId]);
+    const connection = await database.getConnection();
+    try {
+        await connection.beginTransaction();
+        const [cars] = await connection.execute(
+            'SELECT id, image_url AS image FROM cars WHERE id = ? FOR UPDATE',
+            [carId]
+        );
+        if (!cars.length) {
+            await connection.rollback();
+            await Promise.all(req.files.map(file => unlinkFile(file.path)));
+            return res.status(404).json({ error: 'ไม่พบรถที่ต้องการเพิ่มรูปภาพ' });
+        }
+        const [existingImages] = await connection.execute(
+            'SELECT COUNT(*) AS imageCount, COALESCE(MAX(sort_order), -1) AS lastOrder FROM car_images WHERE car_id = ?',
+            [carId]
+        );
+        const existingImageCount = Number(existingImages[0].imageCount) ||
+            (cars[0].image ? 1 : 0);
+        if (existingImageCount + req.files.length > maxCarImages) {
+            await connection.rollback();
+            await Promise.all(req.files.map(file => unlinkFile(file.path).catch(error => {
+                console.error('Unable to remove excess uploaded car image:', error);
+            })));
+            return res.status(400).json({
+                error: `รถหนึ่งคันเพิ่มรูปได้ไม่เกิน ${maxCarImages} รูป`
+            });
+        }
+
+        const firstOrder = Number(existingImages[0].lastOrder) + 1;
+        const imageRecords = req.files.map((file, index) => [
+            carId, `/uploads/${file.filename}`, firstOrder + index
+        ]);
+        await connection.query(
+            'INSERT INTO car_images (car_id, image_url, sort_order) VALUES ?',
+            [imageRecords]
+        );
+        await connection.execute('UPDATE cars SET image_url = ? WHERE id = ?', [imageRecords[0][1], carId]);
+        await connection.commit();
+    } catch (error) {
+        await connection.rollback();
+        await Promise.all(req.files.map(file => unlinkFile(file.path).catch(unlinkError => {
+            console.error('Unable to remove uploaded car image after failed upload:', unlinkError);
+        })));
+        throw error;
+    } finally {
+        connection.release();
+    }
     res.status(201).json({ message: 'อัปโหลดรูปภาพสำเร็จ', uploadedFiles: req.files.length });
 });
 

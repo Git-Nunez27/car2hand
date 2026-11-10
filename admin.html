@@ -98,7 +98,7 @@
                     <label class="block text-sm font-medium">รับประกัน (ปี)
                         <input name="warranty_years" type="number" min="0" max="20" step="1" value="5" class="form-input">
                     </label>
-                    <label class="block text-sm font-medium sm:col-span-2">รูปภาพจากเครื่อง (JPG, PNG, WebP สูงสุด 10 รูป รูปละไม่เกิน 5 MB)
+                    <label class="block text-sm font-medium sm:col-span-2">รูปภาพจากเครื่อง (JPG, PNG, WebP รวมไม่เกิน 20 รูป รูปละไม่เกิน 5 MB)
                         <input id="carImages" name="images" type="file" accept="image/jpeg,image/png,image/webp" multiple class="form-input">
                     </label>
                     <p id="selectedImages" class="sm:col-span-2 text-sm text-slate-500" aria-live="polite">ยังไม่ได้เลือกรูปภาพ</p>
@@ -141,6 +141,7 @@
         let adminKey = '';
         let adminCars = [];
         let editingCarId = null;
+        const maxCarImages = 20;
 
         function escapeHTML(value) {
             return String(value ?? '').replace(/[&<>"']/g, character => ({
@@ -150,6 +151,10 @@
                 '"': '&quot;',
                 "'": '&#39;'
             })[character]);
+        }
+
+        function getCarImageCount(car) {
+            return car.imageRecords?.length ?? car.images?.length ?? (car.image ? 1 : 0);
         }
 
         async function loadAdminCars() {
@@ -200,6 +205,7 @@
             carForm.elements.transmission.value = 'Automatic';
             carForm.elements.fuel.value = 'Petrol';
             imageInput.setCustomValidity('');
+            imageInput.max = String(maxCarImages);
             selectedImages.textContent = 'ยังไม่ได้เลือกรูปภาพ';
             selectedImages.classList.remove('text-red-700');
             existingImageOrder.innerHTML = '';
@@ -216,6 +222,8 @@
             editingCarId = carId;
             imageInput.value = '';
             imageInput.setCustomValidity('');
+            const existingImageCount = getCarImageCount(car);
+            imageInput.max = String(Math.max(0, maxCarImages - existingImageCount));
             for (const [field, value] of Object.entries({
                 brand: car.make,
                 model: car.model,
@@ -236,7 +244,7 @@
             }
             carForm.elements.is_featured.checked = Boolean(Number(car.isFeatured));
             carForm.elements.is_hot_deal.checked = Boolean(Number(car.isHotDeal));
-            selectedImages.textContent = `รูปปัจจุบัน ${car.images?.length || 0} รูป · เลือกรูปเพิ่มได้อีกไม่เกิน 10 รูป`;
+            selectedImages.textContent = `รูปปัจจุบัน ${existingImageCount} รูป · เพิ่มได้อีกไม่เกิน ${maxCarImages - existingImageCount} รูป`;
             renderImageOrder(car);
             formTitle.textContent = `แก้ไขข้อมูลรถ #${carId}`;
             saveButton.textContent = 'บันทึกการแก้ไข';
@@ -344,10 +352,13 @@
 
         imageInput.addEventListener('change', () => {
             const files = Array.from(imageInput.files);
+            const car = adminCars.find(item => Number(item.id) === editingCarId);
+            const existingImageCount = car ? getCarImageCount(car) : 0;
+            const availableSlots = Math.max(0, maxCarImages - existingImageCount);
             const totalSize = files.reduce((total, file) => total + file.size, 0);
             const invalidType = files.some(file => !['image/jpeg', 'image/png', 'image/webp'].includes(file.type));
-            const selectionError = files.length > 10
-                ? 'เลือกรูปได้ไม่เกิน 10 รูป'
+            const selectionError = files.length > availableSlots
+                ? `เพิ่มรูปได้อีกไม่เกิน ${availableSlots} รูป (รวมสูงสุด ${maxCarImages} รูป)`
                 : files.some(file => file.size > 5 * 1024 * 1024)
                     ? 'ขนาดรูปแต่ละไฟล์ต้องไม่เกิน 5 MB'
                     : invalidType
@@ -355,8 +366,10 @@
                         : '';
             imageInput.setCustomValidity(selectionError);
             selectedImages.textContent = files.length
-                ? `${selectionError || `เลือกรูป ${files.length} รูป (${(totalSize / (1024 * 1024)).toFixed(2)} MB)`}: ${files.map(file => file.name).join(', ')}`
-                : 'ยังไม่ได้เลือกรูปภาพ';
+                ? `${selectionError || `เลือกรูป ${files.length} รูป · รวม ${existingImageCount + files.length} รูป (${(totalSize / (1024 * 1024)).toFixed(2)} MB)`}: ${files.map(file => file.name).join(', ')}`
+                : editingCarId === null
+                    ? 'ยังไม่ได้เลือกรูปภาพ'
+                    : `รูปปัจจุบัน ${existingImageCount} รูป · เพิ่มได้อีกไม่เกิน ${availableSlots} รูป`;
             selectedImages.classList.toggle('text-red-700', Boolean(selectionError));
         });
 
