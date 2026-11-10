@@ -248,16 +248,19 @@
         function renderImageOrder(car) {
             const images = car.imageRecords || [];
             existingImageOrder.innerHTML = images.length
-                ? `<p class="text-sm font-medium">เรียงรูปที่มีอยู่ (รูปแรกจะแสดงเป็นรูปหลัก)</p>
+                ? `<p class="text-sm font-medium mb-2">📸 จัดการรูปภาพ <span class="font-normal text-slate-500">(รูปแรก = หน้าปกที่แสดงบนการ์ด)</span></p>
                     <div class="flex gap-3 overflow-x-auto pb-2">
                         ${images.map((image, index) => `
-                            <div class="shrink-0 w-28 rounded border border-black/10 p-2 text-center">
-                                <img src="${escapeHTML(image.url)}" alt="รูปที่ ${index + 1}" class="h-16 w-full rounded object-cover">
-                                <p class="my-1 text-xs">${index === 0 ? 'ภาพหลัก' : `รูปที่ ${index + 1}`}</p>
-                                ${index > 0 ? `<button type="button" onclick="setCarPrimaryImage(${car.id}, ${index})" class="mb-1 rounded border border-red-200 px-2 py-1 text-[11px] text-red-700 hover:bg-red-50">ตั้งเป็นภาพแรก</button>` : ''}
+                            <div class="shrink-0 w-32 rounded-lg border-2 ${index === 0 ? 'border-red-500 bg-red-50' : 'border-black/10 bg-white'} p-2 text-center">
+                                <div class="relative">
+                                    <img src="${escapeHTML(image.url)}" alt="รูปที่ ${index + 1}" class="h-20 w-full rounded object-cover">
+                                    ${index === 0 ? `<span class="absolute top-1 left-1 bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">📌 หน้าปก</span>` : ''}
+                                </div>
+                                <p class="mt-1.5 text-[11px] font-medium ${index === 0 ? 'text-red-700' : 'text-slate-500'}">${index === 0 ? 'หน้าปก' : `รูปที่ ${index + 1}`}</p>
+                                ${index > 0 ? `<button type="button" onclick="setCarPrimaryImage(${car.id}, ${index})" class="mt-1 mb-1 w-full rounded bg-red-600 text-white px-2 py-1 text-[11px] font-medium hover:bg-red-700">📌 ตั้งเป็นหน้าปก</button>` : '<div class="mt-1 mb-1 h-6"></div>'}
                                 <div class="flex justify-center gap-1">
-                                    <button type="button" onclick="moveCarImage(${car.id}, ${index}, -1)" ${index === 0 ? 'disabled' : ''} aria-label="เลื่อนรูปที่ ${index + 1} ไปซ้าย" class="rounded border px-2 py-1 disabled:opacity-30">←</button>
-                                    <button type="button" onclick="moveCarImage(${car.id}, ${index}, 1)" ${index === images.length - 1 ? 'disabled' : ''} aria-label="เลื่อนรูปที่ ${index + 1} ไปขวา" class="rounded border px-2 py-1 disabled:opacity-30">→</button>
+                                    <button type="button" onclick="moveCarImage(${car.id}, ${index}, -1)" ${index === 0 ? 'disabled' : ''} aria-label="เลื่อนรูปที่ ${index + 1} ไปซ้าย" class="rounded border px-2 py-1 text-xs disabled:opacity-30 hover:bg-slate-100">←</button>
+                                    <button type="button" onclick="moveCarImage(${car.id}, ${index}, 1)" ${index === images.length - 1 ? 'disabled' : ''} aria-label="เลื่อนรูปที่ ${index + 1} ไปขวา" class="rounded border px-2 py-1 text-xs disabled:opacity-30 hover:bg-slate-100">→</button>
                                 </div>
                             </div>
                         `).join('')}
@@ -286,6 +289,7 @@
 
         async function saveCarImageOrder(car, images) {
             existingImageOrder.querySelectorAll('button').forEach(button => button.disabled = true);
+            inventoryMessage.classList.remove('text-red-700');
             try {
                 const response = await fetch(`/api/cars/${car.id}/images/order`, {
                     method: 'PUT',
@@ -305,6 +309,8 @@
             } catch (error) {
                 inventoryMessage.textContent = error.message || 'บันทึกลำดับรูปไม่สำเร็จ';
                 inventoryMessage.classList.add('text-red-700');
+            } finally {
+                existingImageOrder.querySelectorAll('button').forEach(button => button.disabled = false);
             }
         }
 

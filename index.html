@@ -1471,6 +1471,11 @@
             };
         }
 
+        function getCarImages(car) {
+            if (Array.isArray(car.images) && car.images.length) return car.images;
+            return car.image ? [car.image] : [];
+        }
+
         function escapeHTML(value) {
             return String(value).replace(/[&<>"']/g, character => ({
                 '&': '&amp;',
@@ -1510,11 +1515,17 @@
         function createCarCardHTML(car, isHot = false) {
             const isFav = favorites.includes(car.id);
             const monthlyEst = Math.round((car.price * 0.85 * 1.15) / 60).toLocaleString();
+            const images = getCarImages(car);
+            const hasMultipleImages = images.length > 1;
+            const cardGalleryId = `${isHot ? 'hot' : 'featured'}-${car.id}`;
 
             return `
                 <article class="telemetry-card flex flex-col group">
-                    <div class="img-mask-16-10">
-                        <img src="${escapeHTML(car.image)}" alt="${escapeHTML(car.make)} ${escapeHTML(car.model)}">
+                    <div class="img-mask-16-10 touch-pan-y" style="position:relative;"
+                        onpointerdown="startCarCardSwipe(event)"
+                        onpointerup="handleCarCardSwipe(event, ${car.id}, '${cardGalleryId}')"
+                        onpointercancel="cancelCarCardSwipe()">
+                        <img id="card-img-${cardGalleryId}" src="${escapeHTML(images[0] || '')}" alt="${escapeHTML(car.make)} ${escapeHTML(car.model)}" data-idx="0">
                         <div class="img-vignette"></div>
 
                         <!-- Top Left Badges -->
@@ -1528,8 +1539,25 @@
                             <i class="${isFav ? 'fa-solid text-apex-red' : 'fa-regular'} fa-heart text-xs"></i>
                         </button>
 
+                        <!-- Prev/Next arrows on card (show only if multiple images) -->
+                        ${hasMultipleImages ? `
+                        <button type="button" onclick="event.stopPropagation();cardSlide(${car.id},-1,'${cardGalleryId}')" aria-label="รูปก่อนหน้า"
+                            class="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-black/60 text-white border border-white/20 hover:bg-black/90 transition opacity-0 group-hover:opacity-100">
+                            <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                        </button>
+                        <button type="button" onclick="event.stopPropagation();cardSlide(${car.id},1,'${cardGalleryId}')" aria-label="รูปถัดไป"
+                            class="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-black/60 text-white border border-white/20 hover:bg-black/90 transition opacity-0 group-hover:opacity-100">
+                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </button>
+                        <!-- Dot indicators -->
+                        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-1 z-10 opacity-0 group-hover:opacity-100 transition">
+                            ${images.map((_, i) => `<span id="card-dot-${cardGalleryId}-${i}" class="w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-white' : 'bg-white/40'}"></span>`).join('')}
+                        </div>
+                        ` : ''}
+
                         <div class="absolute bottom-2.5 right-2.5 bg-obsidian-base/90 border border-white/10 text-slate-300 text-[10px] font-mono px-2 py-0.5">
                             <i class="fa-solid fa-gauge text-apex-red mr-1"></i> ${Number(car.mileage).toLocaleString()} KM
+                            ${hasMultipleImages ? `<span class="ml-1 text-slate-500">· <i class="fa-solid fa-images text-[9px]"></i> ${images.length}</span>` : ''}
                         </div>
                     </div>
 
@@ -1623,6 +1651,7 @@
             const car = CAR_DATASET.find(c => c.id === carId);
             if (!car) return;
 
+            const images = getCarImages(car);
             const modalContent = document.getElementById('modalCarContent');
             const monthlyEst = Math.round((car.price * 0.85 * 1.15) / 60).toLocaleString();
 
@@ -1634,29 +1663,29 @@
                             onpointerdown="startCarGallerySwipe(event)"
                             onpointerup="handleCarGallerySwipe(event, ${car.id})"
                             onpointercancel="cancelCarGallerySwipe()">
-                            <img id="carGalleryMainImage" src="${escapeHTML(car.images[0])}" data-image-index="0" alt="${escapeHTML(car.make)} ${escapeHTML(car.model)}" class="w-full h-full object-cover">
+                            <img id="carGalleryMainImage" src="${escapeHTML(images[0] || '')}" data-image-index="0" alt="${escapeHTML(car.make)} ${escapeHTML(car.model)}" class="w-full h-full object-cover">
                             <div class="img-vignette"></div>
                             <div class="absolute top-3 left-3 gold-certified-badge">
                                 <i class="fa-solid fa-shield-halved"></i> CARS27 5-YEAR CERTIFIED WARRANTY
                             </div>
-                            ${car.images.length > 1 ? `
+                            ${images.length > 1 ? `
                                 <button type="button" onclick="changeCarGalleryImage(${car.id}, -1)" aria-label="ดูรูปรถก่อนหน้า" class="absolute left-3 top-1/2 -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/65 text-white hover:bg-black/85">
                                     <i class="fa-solid fa-chevron-left"></i>
                                 </button>
                                 <button type="button" onclick="changeCarGalleryImage(${car.id}, 1)" aria-label="ดูรูปรถถัดไป" class="absolute right-3 top-1/2 -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/65 text-white hover:bg-black/85">
                                     <i class="fa-solid fa-chevron-right"></i>
                                 </button>
-                                <span id="carGallerySlideCount" class="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 rounded-full bg-black/70 px-3 py-1 text-[11px] font-mono text-white">1 / ${car.images.length}</span>
+                                <span id="carGallerySlideCount" class="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 rounded-full bg-black/70 px-3 py-1 text-[11px] font-mono text-white">1 / ${images.length}</span>
                             ` : ''}
                         </div>
-                        ${car.images.length > 1 ? `
+                        ${images.length > 1 ? `
                             <div>
                                 <div class="flex items-center justify-between mb-2 text-[10px] font-mono text-slate-400">
                                     <span>รูปภาพรถเพิ่มเติม</span>
-                                    <span id="carGalleryImageCount">1 / ${car.images.length}</span>
+                                    <span id="carGalleryImageCount">1 / ${images.length}</span>
                                 </div>
                                 <div class="flex gap-2 overflow-x-auto pb-2" aria-label="เลื่อนเพื่อดูรูปภาพรถเพิ่มเติม">
-                                    ${car.images.map((image, index) => `
+                                    ${images.map((image, index) => `
                                         <button type="button" onclick="showCarGalleryImage(${car.id}, ${index})" aria-label="ดูรูปรถภาพที่ ${index + 1}" aria-pressed="${index === 0}" class="car-gallery-thumbnail shrink-0 w-24 h-16 overflow-hidden rounded-sm border-2 ${index === 0 ? 'border-apex-red' : 'border-white/10'}">
                                             <img src="${escapeHTML(image)}" alt="" class="w-full h-full object-cover">
                                         </button>
@@ -1734,13 +1763,14 @@
 
         function showCarGalleryImage(carId, imageIndex) {
             const car = CAR_DATASET.find(item => item.id === carId);
-            if (!car || !Number.isInteger(imageIndex) || !car.images[imageIndex]) return;
+            const images = car ? getCarImages(car) : [];
+            if (!car || !Number.isInteger(imageIndex) || !images[imageIndex]) return;
 
             const mainImage = document.getElementById('carGalleryMainImage');
             if (!mainImage) return;
-            mainImage.src = car.images[imageIndex];
+            mainImage.src = images[imageIndex];
             const imageCount = document.getElementById('carGalleryImageCount');
-            if (imageCount) imageCount.textContent = `${imageIndex + 1} / ${car.images.length}`;
+            if (imageCount) imageCount.textContent = `${imageIndex + 1} / ${images.length}`;
             document.querySelectorAll('.car-gallery-thumbnail').forEach((thumbnail, index) => {
                 const isSelected = index === imageIndex;
                 thumbnail.classList.toggle('border-apex-red', isSelected);
@@ -1749,17 +1779,57 @@
                 if (isSelected) thumbnail.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
             });
             const counter = document.getElementById('carGallerySlideCount');
-            if (counter) counter.textContent = `${imageIndex + 1} / ${car.images.length}`;
+            if (counter) counter.textContent = `${imageIndex + 1} / ${images.length}`;
             mainImage.dataset.imageIndex = String(imageIndex);
         }
 
         function changeCarGalleryImage(carId, direction) {
             const car = CAR_DATASET.find(item => item.id === carId);
             const mainImage = document.getElementById('carGalleryMainImage');
-            if (!car || !mainImage || car.images.length < 2) return;
+            const images = car ? getCarImages(car) : [];
+            if (!car || !mainImage || images.length < 2) return;
             const currentIndex = Number(mainImage.dataset.imageIndex || 0);
-            const nextIndex = (currentIndex + direction + car.images.length) % car.images.length;
+            const nextIndex = (currentIndex + direction + images.length) % images.length;
             showCarGalleryImage(carId, nextIndex);
+        }
+
+        // Mini slider on car cards
+        function cardSlide(carId, direction, cardGalleryId) {
+            const car = CAR_DATASET.find(item => item.id === carId);
+            const images = car ? getCarImages(car) : [];
+            const img = document.getElementById(`card-img-${cardGalleryId}`);
+            if (!car || !img || images.length < 2) return;
+            const current = Number(img.dataset.idx || 0);
+            const next = (current + direction + images.length) % images.length;
+            img.src = images[next];
+            img.dataset.idx = String(next);
+            images.forEach((_, i) => {
+                const dot = document.getElementById(`card-dot-${cardGalleryId}-${i}`);
+                if (dot) {
+                    dot.className = `w-1.5 h-1.5 rounded-full ${i === next ? 'bg-white' : 'bg-white/40'}`;
+                }
+            });
+        }
+
+        let carCardPointerStart = null;
+        function startCarCardSwipe(event) {
+            if (event.pointerType === 'touch' && !event.target.closest('button')) {
+                carCardPointerStart = { x: event.clientX, y: event.clientY };
+            }
+        }
+
+        function handleCarCardSwipe(event, carId, cardGalleryId) {
+            if (!carCardPointerStart || event.pointerType !== 'touch') return;
+            const deltaX = event.clientX - carCardPointerStart.x;
+            const deltaY = event.clientY - carCardPointerStart.y;
+            carCardPointerStart = null;
+            if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY)) {
+                cardSlide(carId, deltaX < 0 ? 1 : -1, cardGalleryId);
+            }
+        }
+
+        function cancelCarCardSwipe() {
+            carCardPointerStart = null;
         }
 
         let carGalleryPointerStart = null;
