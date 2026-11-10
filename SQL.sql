@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS cars (
     color VARCHAR(30),                   -- สีรถ
     license_plate VARCHAR(20),           -- ทะเบียนรถ
     image_url VARCHAR(500) NULL,
+    video_url VARCHAR(500) NULL,
     is_featured BOOLEAN NOT NULL DEFAULT TRUE,
     is_hot_deal BOOLEAN NOT NULL DEFAULT FALSE,
     warranty_years INT NOT NULL DEFAULT 5,
@@ -38,9 +39,13 @@ CREATE TABLE IF NOT EXISTS cars (
 --     ADD COLUMN fuel VARCHAR(40) NOT NULL DEFAULT 'ไม่ระบุ',
 --     ADD COLUMN engine VARCHAR(50) NOT NULL DEFAULT '',
 --     ADD COLUMN image_url VARCHAR(500) NULL,
+--     ADD COLUMN video_url VARCHAR(500) NULL,
 --     ADD COLUMN is_featured BOOLEAN NOT NULL DEFAULT TRUE,
 --     ADD COLUMN is_hot_deal BOOLEAN NOT NULL DEFAULT FALSE,
 --     ADD COLUMN warranty_years INT NOT NULL DEFAULT 5;
+
+-- For existing databases that already have the other car columns, run once:
+-- ALTER TABLE cars ADD COLUMN video_url VARCHAR(500) NULL;
 
 -- สร้างตารางเก็บข้อมูลลูกค้าที่ติดต่อ/สนใจรถ (Leads)
 CREATE TABLE IF NOT EXISTS leads (

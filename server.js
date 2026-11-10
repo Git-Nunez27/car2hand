@@ -13,8 +13,11 @@ if (fs.existsSync(envFile)) {
 
 const app = express();
 const uploadDirectory = path.join(__dirname, 'uploads');
+const videoDirectory = path.join(uploadDirectory, 'videos');
 const unlinkFile = promisify(fs.unlink);
 const maxCarImages = 20;
+const maxCarVideoSize = 200 * 1024 * 1024;
+let carVideoColumnExists = null;
 const port = Number(process.env.PORT || 3000);
 const database = mysql.createPool({
     host: process.env.DB_HOST || '127.0.0.1',
@@ -30,6 +33,7 @@ const database = mysql.createPool({
 }).promise();
 
 fs.mkdirSync(uploadDirectory, { recursive: true });
+fs.mkdirSync(videoDirectory, { recursive: true });
 app.disable('x-powered-by');
 app.use(express.json({ limit: '1mb' }));
 app.use('/uploads', express.static(uploadDirectory));
@@ -76,6 +80,57 @@ const upload = multer({
         callback(null, true);
     }
 });
+const videoExtensions = new Map([
+    ['video/mp4', '.mp4'],
+    ['video/webm', '.webm']
+]);
+const videoUpload = multer({
+    storage: multer.diskStorage({
+        destination: videoDirectory,
+        filename: (req, file, callback) => {
+            callback(null, `${crypto.randomUUID()}${videoExtensions.get(file.mimetype)}`);
+        }
+    }),
+    limits: { fileSize: maxCarVideoSize, files: 1 },
+    fileFilter: (req, file, callback) => {
+        if (!videoExtensions.has(file.mimetype)) {
+            return callback(new Error('รองรับเฉพาะวิดีโอ MP4 และ WebM'));
+        }
+        callback(null, true);
+    }
+});
+
+async function hasCarVideoColumn() {
+    if (carVideoColumnExists) return true;
+    try {
+        await database.query('SELECT video_url FROM cars LIMIT 0');
+        carVideoColumnExists = true;
+        return true;
+    } catch (error) {
+        if (error.code === 'ER_BAD_FIELD_ERROR') {
+            if (carVideoColumnExists !== false) {
+                console.warn('Car video upload is unavailable until the cars.video_url migration is applied.');
+            }
+            carVideoColumnExists = false;
+            return false;
+        }
+        throw error;
+    }
+}
+
+async function removeUploadedVideo(videoUrl) {
+    if (!videoUrl?.startsWith('/uploads/videos/')) return;
+    const filename = path.basename(videoUrl);
+    const videoPath = path.resolve(videoDirectory, filename);
+    if (path.dirname(videoPath) !== path.resolve(videoDirectory)) return;
+    try {
+        await unlinkFile(videoPath);
+    } catch (error) {
+        if (error.code !== 'ENOENT') {
+            console.error('Unable to remove uploaded car video:', error);
+        }
+    }
+}
 
 app.get('/api/health', async (req, res) => {
     await database.query('SELECT 1');
@@ -87,6 +142,7 @@ app.get('/api/admin/session', requireCarAdmin, (req, res) => {
 });
 
 async function getCars(includeAll = false) {
+    const hasVideoColumn = await hasCarVideoColumn();
     const [cars] = await database.query(`SELECT
         id,
         brand AS make,
@@ -105,6 +161,7 @@ async function getCars(includeAll = false) {
         is_hot_deal AS isHotDeal,
         warranty_years AS warrantyYears,
         image_url AS image,
+        ${hasVideoColumn ? 'video_url AS videoUrl,' : 'NULL AS videoUrl,'}
         description,
         status
         FROM cars
@@ -526,6 +583,97 @@ app.delete('/api/cars/:id/images/:imageId', requireCarAdmin, async (req, res) =>
     res.json({ message: 'ลบรูปภาพเรียบร้อยแล้ว' });
 });
 
+app.put('/api/cars/:id/video', requireCarAdmin, async (req, res, next) => {
+    if (!await hasCarVideoColumn()) {
+        return res.status(503).json({ error: 'กรุณาเพิ่มคอลัมน์ video_url ในตาราง cars ก่อนอัปโหลดคลิป' });
+    }
+    videoUpload.single('video')(req, res, error => {
+        if (error) return next(error);
+        saveCarVideo(req, res).catch(next);
+    });
+});
+
+async function saveCarVideo(req, res) {
+    const carId = Number(req.params.id);
+    if (!Number.isInteger(carId) || carId <= 0) {
+        if (req.file) await removeUploadedVideo(`/uploads/videos/${req.file.filename}`);
+        return res.status(400).json({ error: 'รหัสรถไม่ถูกต้อง' });
+    }
+    if (!req.file) {
+        return res.status(400).json({ error: 'กรุณาแนบไฟล์วิดีโอ' });
+    }
+
+    const videoUrl = `/uploads/videos/${req.file.filename}`;
+    let connection;
+    let previousVideoUrl;
+    try {
+        connection = await database.getConnection();
+        await connection.beginTransaction();
+        const [cars] = await connection.execute(
+            'SELECT video_url AS videoUrl FROM cars WHERE id = ? FOR UPDATE',
+            [carId]
+        );
+        if (!cars.length) {
+            await connection.rollback();
+            await removeUploadedVideo(videoUrl);
+            return res.status(404).json({ error: 'ไม่พบรถที่ต้องการเพิ่มคลิป' });
+        }
+        previousVideoUrl = cars[0].videoUrl;
+        await connection.execute('UPDATE cars SET video_url = ? WHERE id = ?', [videoUrl, carId]);
+        await connection.commit();
+    } catch (error) {
+        if (connection) await connection.rollback();
+        await removeUploadedVideo(videoUrl);
+        throw error;
+    } finally {
+        connection?.release();
+    }
+
+    if (previousVideoUrl && previousVideoUrl !== videoUrl) {
+        await removeUploadedVideo(previousVideoUrl);
+    }
+    res.json({ message: 'บันทึกคลิปแนะนำรถเรียบร้อยแล้ว', videoUrl });
+}
+
+app.delete('/api/cars/:id/video', requireCarAdmin, async (req, res) => {
+    if (!await hasCarVideoColumn()) {
+        return res.status(503).json({ error: 'ยังไม่ได้ตั้งค่าระบบคลิปวิดีโอในฐานข้อมูล' });
+    }
+    const carId = Number(req.params.id);
+    if (!Number.isInteger(carId) || carId <= 0) {
+        return res.status(400).json({ error: 'รหัสรถไม่ถูกต้อง' });
+    }
+
+    const connection = await database.getConnection();
+    let videoUrl;
+    try {
+        await connection.beginTransaction();
+        const [cars] = await connection.execute(
+            'SELECT video_url AS videoUrl FROM cars WHERE id = ? FOR UPDATE',
+            [carId]
+        );
+        if (!cars.length) {
+            await connection.rollback();
+            return res.status(404).json({ error: 'ไม่พบรถที่ต้องการลบคลิป' });
+        }
+        videoUrl = cars[0].videoUrl;
+        if (!videoUrl) {
+            await connection.rollback();
+            return res.status(404).json({ error: 'รถคันนี้ยังไม่มีคลิป' });
+        }
+        await connection.execute('UPDATE cars SET video_url = NULL WHERE id = ?', [carId]);
+        await connection.commit();
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+
+    await removeUploadedVideo(videoUrl);
+    res.json({ message: 'ลบคลิปแนะนำรถเรียบร้อยแล้ว' });
+});
+
 app.delete('/api/cars/:id', requireCarAdmin, async (req, res) => {
     const carId = Number(req.params.id);
     if (!Number.isInteger(carId) || carId <= 0) {
@@ -534,10 +682,12 @@ app.delete('/api/cars/:id', requireCarAdmin, async (req, res) => {
 
     const connection = await database.getConnection();
     let imageUrls;
+    let carVideoUrl;
     try {
         await connection.beginTransaction();
+        const hasVideoColumn = await hasCarVideoColumn();
         const [cars] = await connection.execute(
-            'SELECT image_url AS image FROM cars WHERE id = ? FOR UPDATE',
+            `SELECT image_url AS image${hasVideoColumn ? ', video_url AS videoUrl' : ''} FROM cars WHERE id = ? FOR UPDATE`,
             [carId]
         );
         if (!cars.length) {
@@ -549,6 +699,7 @@ app.delete('/api/cars/:id', requireCarAdmin, async (req, res) => {
             [carId]
         );
         imageUrls = [...new Set([cars[0].image, ...images.map(image => image.image)].filter(Boolean))];
+        carVideoUrl = cars[0].videoUrl;
         await connection.execute('DELETE FROM cars WHERE id = ?', [carId]);
         await connection.commit();
     } catch (error) {
@@ -571,6 +722,7 @@ app.delete('/api/cars/:id', requireCarAdmin, async (req, res) => {
             }
         }
     }));
+    await removeUploadedVideo(carsVideoUrl);
 
     res.json({ message: 'ลบข้อมูลรถเรียบร้อยแล้ว', id: carId });
 });
@@ -669,12 +821,20 @@ app.use((error, req, res, next) => {
         return next(error);
     }
     if (error instanceof multer.MulterError) {
-        return res.status(400).json({ error: 'ไฟล์รูปภาพไม่ถูกต้องหรือมีขนาดใหญ่เกินกำหนด' });
+        const message = error.code === 'LIMIT_FILE_SIZE'
+            ? error.field === 'video'
+                ? 'ขนาดคลิปต้องไม่เกิน 200 MB'
+                : 'ขนาดรูปแต่ละไฟล์ต้องไม่เกิน 5 MB'
+            : 'ไฟล์รูปภาพหรือวิดีโอไม่ถูกต้อง หรือมีไฟล์มากเกินกำหนด';
+        return res.status(400).json({ error: message });
     }
     if (error.type === 'entity.too.large') {
         return res.status(413).json({ error: 'ข้อมูลหรือไฟล์ที่ส่งมามีขนาดใหญ่เกินกำหนด' });
     }
     if (error.message === 'รองรับเฉพาะไฟล์ JPG, PNG และ WebP') {
+        return res.status(400).json({ error: error.message });
+    }
+    if (error.message === 'รองรับเฉพาะวิดีโอ MP4 และ WebM') {
         return res.status(400).json({ error: error.message });
     }
     if (error instanceof SyntaxError && error.status === 400 && 'body' in error) {
