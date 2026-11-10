@@ -428,6 +428,104 @@ app.put('/api/cars/:id/images/order', requireCarAdmin, async (req, res) => {
     res.json({ message: 'บันทึกลำดับรูปภาพเรียบร้อยแล้ว' });
 });
 
+app.delete('/api/cars/:id/images/:imageId', requireCarAdmin, async (req, res) => {
+    const carId = Number(req.params.id);
+    const imageId = req.params.imageId;
+    if (!Number.isInteger(carId) || carId <= 0 ||
+        (imageId !== 'primary' && (!/^\d+$/.test(imageId) || Number(imageId) <= 0))) {
+        return res.status(400).json({ error: 'รหัสรูปภาพไม่ถูกต้อง' });
+    }
+
+    const connection = await database.getConnection();
+    let removedImageUrl;
+    let imageIsUnused = false;
+    try {
+        await connection.beginTransaction();
+        const [cars] = await connection.execute(
+            'SELECT id, image_url AS image FROM cars WHERE id = ? FOR UPDATE',
+            [carId]
+        );
+        if (!cars.length) {
+            await connection.rollback();
+            return res.status(404).json({ error: 'ไม่พบรถที่ต้องการลบรูปภาพ' });
+        }
+
+        if (imageId === 'primary') {
+            const [images] = await connection.execute(
+                'SELECT id FROM car_images WHERE car_id = ? LIMIT 1 FOR UPDATE',
+                [carId]
+            );
+            if (images.length || !cars[0].image) {
+                await connection.rollback();
+                return res.status(404).json({ error: 'ไม่พบรูปภาพที่ต้องการลบ' });
+            }
+            removedImageUrl = cars[0].image;
+            await connection.execute('UPDATE cars SET image_url = NULL WHERE id = ?', [carId]);
+        } else {
+            const [images] = await connection.execute(
+                'SELECT id, image_url AS image FROM car_images WHERE id = ? AND car_id = ? FOR UPDATE',
+                [Number(imageId), carId]
+            );
+            if (!images.length) {
+                await connection.rollback();
+                return res.status(404).json({ error: 'ไม่พบรูปภาพที่ต้องการลบ' });
+            }
+
+            removedImageUrl = images[0].image;
+            await connection.execute(
+                'DELETE FROM car_images WHERE id = ? AND car_id = ?',
+                [Number(imageId), carId]
+            );
+            const [remainingImages] = await connection.execute(
+                'SELECT id, image_url AS image FROM car_images WHERE car_id = ? ORDER BY sort_order, id FOR UPDATE',
+                [carId]
+            );
+            for (const [sortOrder, image] of remainingImages.entries()) {
+                await connection.execute(
+                    'UPDATE car_images SET sort_order = ? WHERE id = ? AND car_id = ?',
+                    [sortOrder, image.id, carId]
+                );
+            }
+            await connection.execute(
+                'UPDATE cars SET image_url = ? WHERE id = ?',
+                [remainingImages[0]?.image || null, carId]
+            );
+        }
+
+        if (removedImageUrl?.startsWith('/uploads/')) {
+            const [references] = await connection.execute(
+                `SELECT
+                    (SELECT COUNT(*) FROM car_images WHERE image_url = ?) +
+                    (SELECT COUNT(*) FROM cars WHERE image_url = ?) AS referenceCount`,
+                [removedImageUrl, removedImageUrl]
+            );
+            imageIsUnused = Number(references[0].referenceCount) === 0;
+        }
+        await connection.commit();
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+
+    if (imageIsUnused) {
+        const filename = path.basename(removedImageUrl);
+        const imagePath = path.resolve(uploadDirectory, filename);
+        if (path.dirname(imagePath) === path.resolve(uploadDirectory)) {
+            try {
+                await unlinkFile(imagePath);
+            } catch (error) {
+                if (error.code !== 'ENOENT') {
+                    console.error('Unable to remove deleted car image:', error);
+                }
+            }
+        }
+    }
+
+    res.json({ message: 'ลบรูปภาพเรียบร้อยแล้ว' });
+});
+
 app.delete('/api/cars/:id', requireCarAdmin, async (req, res) => {
     const carId = Number(req.params.id);
     if (!Number.isInteger(carId) || carId <= 0) {

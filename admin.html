@@ -154,7 +154,7 @@
         }
 
         function getCarImageCount(car) {
-            return car.imageRecords?.length ?? car.images?.length ?? (car.image ? 1 : 0);
+            return car.imageRecords?.length || car.images?.length || (car.image ? 1 : 0);
         }
 
         async function loadAdminCars() {
@@ -254,7 +254,9 @@
         }
 
         function renderImageOrder(car) {
-            const images = car.imageRecords || [];
+            const images = car.imageRecords?.length
+                ? car.imageRecords
+                : car.image ? [{ id: 'primary', url: car.image }] : [];
             existingImageOrder.innerHTML = images.length
                 ? `<p class="text-sm font-medium mb-2">📸 จัดการรูปภาพ <span class="font-normal text-slate-500">(รูปแรก = หน้าปกที่แสดงบนการ์ด)</span></p>
                     <div class="flex gap-3 overflow-x-auto pb-2">
@@ -270,10 +272,48 @@
                                     <button type="button" onclick="moveCarImage(${car.id}, ${index}, -1)" ${index === 0 ? 'disabled' : ''} aria-label="เลื่อนรูปที่ ${index + 1} ไปซ้าย" class="rounded border px-2 py-1 text-xs disabled:opacity-30 hover:bg-slate-100">←</button>
                                     <button type="button" onclick="moveCarImage(${car.id}, ${index}, 1)" ${index === images.length - 1 ? 'disabled' : ''} aria-label="เลื่อนรูปที่ ${index + 1} ไปขวา" class="rounded border px-2 py-1 text-xs disabled:opacity-30 hover:bg-slate-100">→</button>
                                 </div>
+                                <button type="button" onclick="deleteCarImage(${car.id}, '${image.id}')" aria-label="ลบรูปที่ ${index + 1}" class="mt-2 w-full rounded border border-red-200 px-2 py-1 text-[11px] text-red-700 hover:bg-red-50">ลบรูป</button>
                             </div>
                         `).join('')}
                     </div>`
                 : '';
+        }
+
+        async function deleteCarImage(carId, imageId) {
+            const car = adminCars.find(item => Number(item.id) === carId);
+            if (!car || !confirm(`ยืนยันลบรูปภาพนี้จาก ${car.make} ${car.model}?`)) return;
+
+            existingImageOrder.querySelectorAll('button').forEach(button => button.disabled = true);
+            inventoryMessage.classList.remove('text-red-700');
+            try {
+                const response = await fetch(`/api/cars/${carId}/images/${encodeURIComponent(imageId)}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: 'Bearer ' + adminKey }
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'ลบรูปภาพไม่สำเร็จ');
+
+                if (imageId === 'primary') {
+                    car.image = null;
+                    car.images = [];
+                    car.imageRecords = [];
+                } else {
+                    car.imageRecords = (car.imageRecords || []).filter(image => Number(image.id) !== Number(imageId));
+                    car.images = car.imageRecords.map(image => image.url);
+                    car.image = car.imageRecords[0]?.url || null;
+                }
+                if (editingCarId === carId) {
+                    imageInput.max = String(Math.max(0, maxCarImages - getCarImageCount(car)));
+                    selectedImages.textContent = `รูปปัจจุบัน ${getCarImageCount(car)} รูป · เพิ่มได้อีกไม่เกิน ${maxCarImages - getCarImageCount(car)} รูป`;
+                }
+                renderImageOrder(car);
+                renderAdminCars();
+                inventoryMessage.textContent = `ลบรูปภาพ ${car.make} ${car.model} แล้ว`;
+            } catch (error) {
+                inventoryMessage.textContent = error.message || 'ลบรูปภาพไม่สำเร็จ';
+                inventoryMessage.classList.add('text-red-700');
+                existingImageOrder.querySelectorAll('button').forEach(button => button.disabled = false);
+            }
         }
 
         async function moveCarImage(carId, index, direction) {
