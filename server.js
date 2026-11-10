@@ -24,7 +24,8 @@ const database = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    charset: 'utf8mb4'
+    charset: 'utf8mb4',
+    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined
 }).promise();
 
 fs.mkdirSync(uploadDirectory, { recursive: true });
